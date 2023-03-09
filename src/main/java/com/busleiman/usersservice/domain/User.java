@@ -39,9 +39,12 @@ public class User implements Serializable {
 
     private int intents = 0;
 
+    private Long latitude;
+    private Long longitude;
+
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles",
-            joinColumns = {@JoinColumn(name = "role_id")},
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JoinTable(name = "users_roles",
+            joinColumns = {@JoinColumn(name = "users_id")},
+            inverseJoinColumns = @JoinColumn(name = "roles_id"))
     private List<Role> roles;
 }

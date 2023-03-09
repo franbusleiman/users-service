@@ -1,6 +1,9 @@
 package com.busleiman.usersservice.controllers;
 
 import com.busleiman.usersservice.domain.User;
+import com.busleiman.usersservice.domain.dtos.UserDTO;
+import com.busleiman.usersservice.domain.dtos.UserRegister;
+import com.busleiman.usersservice.domain.dtos.UserResponse;
 import com.busleiman.usersservice.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +27,7 @@ public class UserController {
      Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) throws InterruptedException {
+    public ResponseEntity<UserResponse> getUserById(@PathVariable("id") Long id) throws InterruptedException {
 
 
         return ResponseEntity.ok(userService.findById(id));
@@ -39,14 +42,14 @@ public class UserController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<User>> getUsers(){
+    public ResponseEntity<List<UserResponse>> getUsers(){
 
         return ResponseEntity.ok(userService.findAll());
     }
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> createUser(@RequestBody User user){
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserRegister userRegister){
 
-        User user1 = userService.createUser(user);
+        UserResponse user1 = userService.createUser(userRegister);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

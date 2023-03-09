@@ -1,12 +1,22 @@
 package com.busleiman.usersservice.services;
 
+import com.busleiman.usersservice.domain.Role;
 import com.busleiman.usersservice.domain.User;
+import com.busleiman.usersservice.domain.dtos.UserDTO;
+import com.busleiman.usersservice.domain.dtos.UserRegister;
+import com.busleiman.usersservice.domain.dtos.UserResponse;
+import com.busleiman.usersservice.mappers.UserMapper;
+import com.busleiman.usersservice.persistance.RoleRepository;
 import com.busleiman.usersservice.persistance.UserRepository;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -15,11 +25,20 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    RoleRepository roleRepository;
+
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    UserMapper userMapper = UserMapper.userMapper;
+
 
     @Override
-    public User findById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Resource not found"));
+    public UserResponse findById(Long id) {
+        return userMapper.userToUserResponse(userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Resource not found")));
     }
 
     @Override
@@ -30,13 +49,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
-        return (List<User>) userRepository.findAll();
+    public List<UserResponse> findAll() {
+        return userRepository.findAll().stream()
+                .map(user -> userMapper.userToUserResponse(user))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public UserResponse createUser(UserRegister userRegister) {
+
+        User user = userMapper.userRegisterToUser(userRegister);
+
+        user.setPassword(passwordEncoder.encode(userRegister.getPassword()));
+
+        Optional<Role> role = roleRepository.findByName("ROLE_USER");
+        role.ifPresent(value -> user.setRoles(Arrays.asList(value)));
+
+        user.setEnabled(true);
+
+        return userMapper.userToUserResponse(userRepository.save(user));
     }
 
     @Override

@@ -1,18 +1,21 @@
 package com.busleiman.usersservice.services;
 
 import com.busleiman.usersservice.domain.User;
+import com.busleiman.usersservice.domain.dtos.UserDTO;
+import com.busleiman.usersservice.domain.dtos.UserRegister;
+import com.busleiman.usersservice.domain.dtos.UserResponse;
 
 import java.util.List;
 
 public interface UserService {
 
-    User findById(Long id);
+    UserResponse findById(Long id);
 
     User findByUsername(String username);
 
-    List<User> findAll();
+    List<UserResponse> findAll();
 
-    User createUser(User user);
+    UserResponse createUser(UserRegister user);
 
     User changeUserState(User user, Long id);
 
