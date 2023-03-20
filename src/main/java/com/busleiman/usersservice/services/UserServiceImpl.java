@@ -1,5 +1,6 @@
 package com.busleiman.usersservice.services;
 
+import brave.Tracer;
 import com.busleiman.usersservice.domain.Role;
 import com.busleiman.usersservice.domain.User;
 import com.busleiman.usersservice.domain.dtos.UserDTO;
@@ -28,6 +29,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     RoleRepository roleRepository;
 
+    @Autowired
+    Tracer tracer;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -77,6 +80,8 @@ public class UserServiceImpl implements UserService {
 
         user1.setIntents(user.getIntents());
         user1.setEnabled(user.isEnabled());
+
+            tracer.currentSpan().tag("state.change", String.valueOf(user1.isEnabled()));
 
         userRepository.save(user1);
 
