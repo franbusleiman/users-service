@@ -32,6 +32,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     Tracer tracer;
 
+
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
