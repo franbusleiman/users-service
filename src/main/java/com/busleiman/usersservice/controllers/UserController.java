@@ -5,6 +5,7 @@ import com.busleiman.usersservice.domain.dtos.UserDTO;
 import com.busleiman.usersservice.domain.dtos.UserRegister;
 import com.busleiman.usersservice.domain.dtos.UserResponse;
 import com.busleiman.usersservice.services.UserService;
+import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,16 @@ public class UserController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> getUserById(@PathVariable("id") Long id) throws InterruptedException {
 
+        if (id == 5L) {
+            Thread.sleep(2000);
+        }
+        else if (id ==6L){
+            throw new InterruptedException();
+        }
+
+        else if (id ==7L){
+            throw new com.busleiman.usersservice.exceptions.NotFoundException("usuario no encontrado");
+        }
 
         return ResponseEntity.ok(userService.findById(id));
     }
