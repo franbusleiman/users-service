@@ -1,4 +1,16 @@
 FROM openjdk:8
-VOLUME /tmp
-ADD ./target/users-service-0.0.1-SNAPSHOT.jar users-service.jar
-ENTRYPOINT ["java", "-jar", "/users-service.jar"]
+
+WORKDIR /app
+
+VOLUME /app/tmp
+
+COPY ./mvnw .
+COPY ./.mvn .mvn
+COPY ./pom.xml .
+
+RUN ./mvnw dependency:go-offline
+
+COPY ./src ./src
+
+RUN ./mvnw clean package
+CMD ["java", "-jar", "./target/users-service-0.0.1-SNAPSHOT.jar"]
