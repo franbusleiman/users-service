@@ -20,4 +20,6 @@ public interface UserService {
     User changeUserState(User user, Long id);
 
     void deleteUser(Long id);
+
+    List<UserResponse> getUsersByLatLongAndDistance(Long latitude, Long longitude, Long km);
 }

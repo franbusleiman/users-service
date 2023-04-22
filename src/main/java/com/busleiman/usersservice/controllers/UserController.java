@@ -61,6 +61,14 @@ public class UserController {
 
         return ResponseEntity.ok(userService.findAll());
     }
+
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserResponse>> getUsers(@RequestParam("latitude") Long latitude, @RequestParam("longitude") Long longitude,
+                                                       @RequestParam("kilometers") Long kilometers){
+
+        return ResponseEntity.ok(userService.getUsersByLatLongAndDistance(latitude, longitude, kilometers));
+    }
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> createUser( @RequestBody @Valid  UserRegister userRegister){
 

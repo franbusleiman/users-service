@@ -98,4 +98,9 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
 
     }
+
+    @Override
+    public List<UserResponse> getUsersByLatLongAndDistance(Long latitude, Long longitude, Long km) {
+        return null;
+    }
 }
