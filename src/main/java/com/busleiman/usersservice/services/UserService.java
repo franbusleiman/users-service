@@ -21,5 +21,5 @@ public interface UserService {
 
     void deleteUser(Long id);
 
-    List<UserResponse> getUsersByLatLongAndDistance(Long latitude, Long longitude, Long km);
+    List<UserResponse> getUsersByLatLongAndDistance(String latitude, String longitude, String km);
 }

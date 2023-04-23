@@ -22,6 +22,6 @@ public class UserDTO {
     private String name;
     private String lastName;
     private String email;
-    private Long latitude;
-    private Long longitude;
+    private Double latitude;
+    private Double longitude;
 }

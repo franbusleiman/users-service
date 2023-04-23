@@ -27,7 +27,7 @@ public class UserRegister {
     private String lastName;
     @Email(message = "must be an valid email")
     private String email;
-    private Long latitude;
-    private Long longitude;
+    private Double latitude;
+    private Double longitude;
     private String password;
 }

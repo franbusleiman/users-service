@@ -63,9 +63,9 @@ public class UserController {
     }
 
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserResponse>> getUsers(@RequestParam("latitude") Long latitude, @RequestParam("longitude") Long longitude,
-                                                       @RequestParam("kilometers") Long kilometers){
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/lld")
+    public ResponseEntity<List<UserResponse>> getUsersByLLD(@RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
+                                                       @RequestParam("kilometers") String kilometers){
 
         return ResponseEntity.ok(userService.getUsersByLatLongAndDistance(latitude, longitude, kilometers));
     }

@@ -39,12 +39,24 @@ public class User implements Serializable {
 
     private int intents = 0;
 
-    private Long latitude;
-    private Long longitude;
+    private Double latitude;
+    private Double longitude;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_roles",
             joinColumns = {@JoinColumn(name = "users_id")},
             inverseJoinColumns = @JoinColumn(name = "roles_id"))
     private List<Role> roles;
+
+
+    public double distanceTo(Double lat, Double lon) {
+        final int R = 6371; // Earth radius in kilometers
+        double dLat = Math.toRadians(lat - latitude);
+        double dLon = Math.toRadians(lon - longitude);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(latitude)) * Math.cos(Math.toRadians(lat)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
 }

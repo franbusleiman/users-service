@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -100,7 +101,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponse> getUsersByLatLongAndDistance(Long latitude, Long longitude, Long km) {
-        return null;
+    public List<UserResponse> getUsersByLatLongAndDistance(String latitude, String longitude, String km) {
+
+        List<User> users = userRepository.findAll();
+
+        return users.stream()
+                .filter(user -> user.distanceTo(Double.parseDouble(latitude), Double.parseDouble(longitude)) <= Double.parseDouble(km))
+                .map(user -> userMapper.userToUserResponse(user))
+                .collect(Collectors.toList());
     }
 }
