@@ -28,7 +28,7 @@ public class BCryptConfig {
 
     public String CLIENT_SECRET = "12345";
 
-    public String AUTH_SERVER = "http://localhost:8085/api/security";
+    public String AUTH_SERVER = "http://144.22.55.224/:8085/api/security";
 
 
     @Bean
