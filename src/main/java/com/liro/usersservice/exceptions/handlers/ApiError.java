@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import lombok.Data;
-import org.hibernate.validator.internal.engine.path.PathImpl;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -100,7 +100,7 @@ public class ApiError {
     private void addValidationError(ConstraintViolation<?> cv) {
         this.addValidationError(
             cv.getRootBeanClass().getSimpleName(),
-            ((PathImpl) cv.getPropertyPath()).getLeafNode().asString(),
+            "((PathImpl) cv.getPropertyPath()).getLeafNode().asString(),",
             cv.getInvalidValue(),
             cv.getMessage());
     }
