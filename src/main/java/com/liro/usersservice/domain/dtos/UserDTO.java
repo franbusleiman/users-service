@@ -26,6 +26,8 @@ public class UserDTO {
     private String identificationNr;
     private String password;
     private LocalDate birthDate;
+    private boolean isEnabled;
+    private Integer intents;
     private Gender gender;
 
 }
