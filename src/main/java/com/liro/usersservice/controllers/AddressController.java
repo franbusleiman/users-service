@@ -28,7 +28,7 @@ public class AddressController {
 
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createAddress(@RequestBody @Valid AddressDTO addressDTO, @RequestHeader(name = "Authorization") String token) {
+    public ResponseEntity<Void> createAddress(@RequestBody @Valid AddressDTO addressDTO, @RequestHeader(name = "Authorization", required = false) String token) {
 
         System.out.println("entro");
         AddressResponse address = addressService.createAddress(addressDTO, getUserId(token));
