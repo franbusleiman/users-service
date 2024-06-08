@@ -48,18 +48,18 @@ public class UserController {
         return ResponseEntity.ok(userService.findByEmail(email));
     }
 
-    @GetMapping(value = "/existByEmail/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> existByEmail(@PathVariable("email") String email)  {
+    @GetMapping(value = "/existsByEmail/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> existsByEmail(@PathVariable("email") String email)  {
 
 
-        return ResponseEntity.ok(userService.existByEmail(email));
+        return ResponseEntity.ok(userService.existsByEmail(email));
     }
 
-    @GetMapping(value = "/existByIdentificationNr/{identificationNr}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> existByIdentificationNr(@PathVariable("identificationNr") String identificationNr)  {
+    @GetMapping(value = "/existsByIdentificationNr/{identificationNr}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> existsByIdentificationNr(@PathVariable("identificationNr") String identificationNr)  {
 
 
-        return ResponseEntity.ok(userService.existByIdentificationNr(identificationNr));
+        return ResponseEntity.ok(userService.existsByIdentificationNr(identificationNr));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

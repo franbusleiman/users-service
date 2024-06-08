@@ -14,8 +14,8 @@ public interface UserService {
 
     UserResponse findByEmail(String email);
 
-    Boolean existByEmail(String email);
-    Boolean existByIdentificationNr(String identificationNr);
+    Boolean existsByEmail(String email);
+    Boolean existsByIdentificationNr(String identificationNr);
 
     List<UserResponse> findAll();
 
