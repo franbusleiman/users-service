@@ -10,15 +10,18 @@ public interface UserService {
 
     UserResponse findById(Long id);
 
-    User findByUsername(String username);
+    UserResponse findByUsername(String username);
 
-    User findByEmail(String email);
+    UserResponse findByEmail(String email);
+
+    Boolean existByEmail(String email);
+    Boolean existByIdentificationNr(String identificationNr);
 
     List<UserResponse> findAll();
 
     UserResponse createUser(UserRegister user);
 
-    User changeUserState(User user, Long id);
+    UserResponse changeUserState(User user, Long id);
 
     void deleteUser(Long id);
 }

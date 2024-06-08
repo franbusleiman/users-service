@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getUserByUsername(@PathVariable("username") String username) throws InterruptedException {
+    public ResponseEntity<UserResponse> getUserByUsername(@PathVariable("username") String username) throws InterruptedException {
 
         logger.info("Getting user by username");
 
@@ -41,11 +41,25 @@ public class UserController {
     }
 
     @GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getUserByEmail(@PathVariable("email") String email)  {
+    public ResponseEntity<UserResponse> getUserByEmail(@PathVariable("email") String email)  {
 
         logger.info("Getting user by username");
 
         return ResponseEntity.ok(userService.findByEmail(email));
+    }
+
+    @GetMapping(value = "/existByEmail/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> existByEmail(@PathVariable("email") String email)  {
+
+
+        return ResponseEntity.ok(userService.existByEmail(email));
+    }
+
+    @GetMapping(value = "/existByIdentificationNr/{identificationNr}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> existByIdentificationNr(@PathVariable("identificationNr") String identificationNr)  {
+
+
+        return ResponseEntity.ok(userService.existByIdentificationNr(identificationNr));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -69,7 +83,7 @@ public class UserController {
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> changeState(@RequestBody User user,
+    public ResponseEntity<UserResponse> changeState(@RequestBody User user,
                                             @PathVariable("id") Long id){
 
        return ResponseEntity.ok(userService.changeUserState(user, id));

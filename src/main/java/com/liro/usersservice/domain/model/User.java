@@ -19,6 +19,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Table(name = "users")
 @Entity
+@EqualsAndHashCode(exclude = "addresses")
 public class User implements Serializable {
 
     @Id

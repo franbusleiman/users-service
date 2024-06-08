@@ -42,16 +42,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByUsername(String username) {
-        return userRepository.findUserByUsername(username)
+    public UserResponse findByUsername(String username) {
+        User user =  userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
+        return userMapper.userToUserResponse(user);
 
     }
 
     @Override
-    public User findByEmail(String email) {
-        return userRepository.findUserByEmail(email)
+    public UserResponse findByEmail(String email) {
+        User user =  userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
+        return userMapper.userToUserResponse(user);
+    }
+
+    @Override
+    public Boolean existByEmail(String email) {
+        return userRepository.existByEmail(email);
+    }
+
+    @Override
+    public Boolean existByIdentificationNr(String identificationNr) {
+        return userRepository.existByIdentificationNr(identificationNr);
     }
 
     @Override
@@ -78,7 +90,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User changeUserState(User user, Long id) {
+    public UserResponse changeUserState(User user, Long id) {
         User user1 = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
 
@@ -89,7 +101,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user1);
 
-        return user1;
+        return userMapper.userToUserResponse(user1);
     }
 
     @Override
