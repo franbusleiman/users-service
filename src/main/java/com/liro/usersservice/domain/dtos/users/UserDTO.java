@@ -25,7 +25,6 @@ public class UserDTO {
     private String areaPhoneNumber;
     private String identificationNr;
     private LocalDate birthDate;
-    private boolean isEnabled;
     private Integer intents;
     private Gender gender;
 
