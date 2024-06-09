@@ -1,4 +1,4 @@
-package com.liro.usersservice.domain.dtos;
+package com.liro.usersservice.domain.dtos.address;
 
 import com.liro.usersservice.domain.validationGroups.ValidationGroups;
 import lombok.AllArgsConstructor;

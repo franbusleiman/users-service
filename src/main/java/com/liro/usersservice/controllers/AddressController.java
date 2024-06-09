@@ -1,14 +1,10 @@
 package com.liro.usersservice.controllers;
 
-import com.liro.usersservice.domain.dtos.AddressDTO;
-import com.liro.usersservice.domain.dtos.AddressResponse;
-import com.liro.usersservice.domain.dtos.UserRegister;
-import com.liro.usersservice.domain.dtos.UserResponse;
-import com.liro.usersservice.domain.model.Address;
+import com.liro.usersservice.domain.dtos.address.AddressDTO;
+import com.liro.usersservice.domain.dtos.address.AddressResponse;
 import com.liro.usersservice.services.AddressService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.hibernate.tool.schema.internal.exec.ScriptTargetOutputToFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

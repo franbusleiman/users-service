@@ -1,8 +1,9 @@
 package com.liro.usersservice.controllers;
 
+import com.liro.usersservice.domain.dtos.users.UserCompleteResponse;
 import com.liro.usersservice.domain.model.User;
-import com.liro.usersservice.domain.dtos.UserRegister;
-import com.liro.usersservice.domain.dtos.UserResponse;
+import com.liro.usersservice.domain.dtos.users.UserRegister;
+import com.liro.usersservice.domain.dtos.users.UserResponse;
 import com.liro.usersservice.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+
+import static com.liro.usersservice.services.Util.getUser;
 
 @RequestMapping("/users")
 @RestController
@@ -33,11 +36,19 @@ public class UserController {
     }
 
     @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> getUserByUsername(@PathVariable("username") String username) throws InterruptedException {
+    public ResponseEntity<UserCompleteResponse> getUserByUsername(@PathVariable("username") String username) throws InterruptedException {
 
         logger.info("Getting user by username");
 
         return ResponseEntity.ok(userService.findByUsername(username));
+    }
+
+    @GetMapping(value = "/getCurrent", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserResponse> getCurrentUser( @RequestHeader(name = "Authorization",  required = false) String token) throws InterruptedException {
+
+        logger.info("Getting user by username");
+
+        return ResponseEntity.ok(userService.findById(getUser(token).getId()));
     }
 
     @GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)

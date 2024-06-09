@@ -1,10 +1,11 @@
 package com.liro.usersservice.services;
 
 import brave.Tracer;
+import com.liro.usersservice.domain.dtos.users.UserCompleteResponse;
 import com.liro.usersservice.domain.model.Role;
 import com.liro.usersservice.domain.model.User;
-import com.liro.usersservice.domain.dtos.UserRegister;
-import com.liro.usersservice.domain.dtos.UserResponse;
+import com.liro.usersservice.domain.dtos.users.UserRegister;
+import com.liro.usersservice.domain.dtos.users.UserResponse;
 import com.liro.usersservice.mappers.UserMapper;
 import com.liro.usersservice.persistance.RoleRepository;
 import com.liro.usersservice.persistance.UserRepository;
@@ -42,10 +43,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse findByUsername(String username) {
+    public UserCompleteResponse findByUsername(String username) {
         User user =  userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
-        return userMapper.userToUserResponse(user);
+        return userMapper.userToUseCompleteResponse(user);
 
     }
 

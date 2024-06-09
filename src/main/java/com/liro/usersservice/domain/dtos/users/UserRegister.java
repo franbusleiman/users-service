@@ -1,4 +1,4 @@
-package com.liro.usersservice.domain.dtos;
+package com.liro.usersservice.domain.dtos.users;
 
 
 import com.liro.usersservice.domain.enums.Gender;

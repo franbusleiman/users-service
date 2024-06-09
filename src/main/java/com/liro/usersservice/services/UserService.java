@@ -1,8 +1,9 @@
 package com.liro.usersservice.services;
 
+import com.liro.usersservice.domain.dtos.users.UserCompleteResponse;
 import com.liro.usersservice.domain.model.User;
-import com.liro.usersservice.domain.dtos.UserRegister;
-import com.liro.usersservice.domain.dtos.UserResponse;
+import com.liro.usersservice.domain.dtos.users.UserRegister;
+import com.liro.usersservice.domain.dtos.users.UserResponse;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public interface UserService {
 
     UserResponse findById(Long id);
 
-    UserResponse findByUsername(String username);
+    UserCompleteResponse findByUsername(String username);
 
     UserResponse findByEmail(String email);
 

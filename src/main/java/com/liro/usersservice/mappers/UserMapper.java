@@ -1,9 +1,10 @@
 package com.liro.usersservice.mappers;
 
+import com.liro.usersservice.domain.dtos.users.UserCompleteResponse;
 import com.liro.usersservice.domain.model.User;
-import com.liro.usersservice.domain.dtos.UserDTO;
-import com.liro.usersservice.domain.dtos.UserRegister;
-import com.liro.usersservice.domain.dtos.UserResponse;
+import com.liro.usersservice.domain.dtos.users.UserDTO;
+import com.liro.usersservice.domain.dtos.users.UserRegister;
+import com.liro.usersservice.domain.dtos.users.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -19,5 +20,8 @@ public interface UserMapper {
 
     User userRegisterToUser(UserRegister userRegister);
 
+    @Mapping(source = "addresses", target = "addresses")
     UserResponse userToUserResponse(User user);
+
+    UserCompleteResponse userToUseCompleteResponse(User user);
 }

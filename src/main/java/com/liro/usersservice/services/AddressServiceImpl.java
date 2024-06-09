@@ -1,7 +1,7 @@
 package com.liro.usersservice.services;
 
-import com.liro.usersservice.domain.dtos.AddressDTO;
-import com.liro.usersservice.domain.dtos.AddressResponse;
+import com.liro.usersservice.domain.dtos.address.AddressDTO;
+import com.liro.usersservice.domain.dtos.address.AddressResponse;
 import com.liro.usersservice.domain.model.Address;
 import com.liro.usersservice.domain.model.User;
 import com.liro.usersservice.exceptions.ResourceNotFoundException;
@@ -9,7 +9,6 @@ import com.liro.usersservice.mappers.AddressMapper;
 import com.liro.usersservice.persistance.AddressRepository;
 import com.liro.usersservice.persistance.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
