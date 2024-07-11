@@ -2,15 +2,19 @@ package com.liro.usersservice.services;
 
 import com.liro.usersservice.domain.dtos.users.VetProfileDTO;
 import com.liro.usersservice.domain.dtos.users.VetProfileResponse;
+import com.liro.usersservice.domain.model.Role;
 import com.liro.usersservice.domain.model.User;
 import com.liro.usersservice.domain.model.VetProfile;
 import com.liro.usersservice.exceptions.BadRequestException;
 import com.liro.usersservice.exceptions.ResourceNotFoundException;
 import com.liro.usersservice.mappers.VetProfileMapper;
+import com.liro.usersservice.persistance.RoleRepository;
 import com.liro.usersservice.persistance.UserRepository;
 import com.liro.usersservice.persistance.VetProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 import static com.liro.usersservice.services.Util.updateIfNotNull;
 
@@ -20,12 +24,14 @@ public class VetProfileServiceImpl implements VetProfileService {
 
     private final UserRepository userRepository;
     private final VetProfileRepository vetProfileRepository;
+    private final RoleRepository roleRepository;
     private final VetProfileMapper vetProfileMapper;
 
     @Autowired
     public VetProfileServiceImpl(UserRepository userRepository,
                                  VetProfileRepository vetProfileRepository,
-                                 VetProfileMapper vetProfileMapper) {
+                                 VetProfileMapper vetProfileMapper,
+                                 RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.vetProfileRepository = vetProfileRepository;
         this.vetProfileMapper = vetProfileMapper;
@@ -44,8 +50,11 @@ public class VetProfileServiceImpl implements VetProfileService {
             throw new BadRequestException("User with id: " + userId + " already have a vetProfile");
         }
 
-        vetProfile.setUser(user);
-        user.setVetProfile(vetProfile);
+        Optional<Role> role = roleRepository.findByName("ROLE_VET");
+
+        role.ifPresent(value -> user.getRoles().add(value));
+
+        user.setEnabled(true);
 
         return vetProfileMapper.vetProfileToVetProfileResponse(vetProfileRepository.save(vetProfile));
     }
