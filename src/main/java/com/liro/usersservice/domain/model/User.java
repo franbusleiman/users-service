@@ -46,6 +46,10 @@ public class User implements Serializable {
     private boolean isEnabled;
     private int intents = 0;
 
+    @OneToOne(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "user")
+    private VetProfile vetProfile;
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "user")
     private Set<Address> addresses;
     @ManyToMany(fetch = FetchType.LAZY)

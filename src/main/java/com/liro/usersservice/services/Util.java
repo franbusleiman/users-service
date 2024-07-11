@@ -32,4 +32,17 @@ public class Util {
                 .roles((List<String>) claims.get("authorities"))
                 .build();
     }
+
+    public static Long getUserId(String token){
+        Claims claims;
+        Long userId;
+
+        claims = Jwts.parser()
+                //     .setSigningKey("codigo_secreto".getBytes())
+                .setSigningKey("asdfAEGVDSAkdnASBOIAW912927171Q23Q".getBytes())
+                .parseClaimsJws(token.substring(7))
+                .getBody();
+
+        return Long.valueOf((Integer) claims.get("id"));
+    }
 }
