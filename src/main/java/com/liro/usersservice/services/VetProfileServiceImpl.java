@@ -54,8 +54,10 @@ public class VetProfileServiceImpl implements VetProfileService {
         Optional<Role> role = roleRepository.findByName("ROLE_VET");
 
         role.ifPresent(value -> user.getRoles().add(value));
+        user.setVetProfile(vetProfile);
 
-        user.setEnabled(true);
+        vetProfile.setUser(user);
+        vetProfile.setEnabled(true);
 
         return vetProfileMapper.vetProfileToVetProfileResponse(vetProfileRepository.save(vetProfile));
     }
