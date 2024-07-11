@@ -44,6 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse findByIdentificationNr(String id){
+        System.out.println("buscando by identification nr: " + id);
         return userMapper.userToUserResponse(userRepository.findUserByIdentificationNr(id)
                 .orElseThrow(() -> new RuntimeException("Resource not found")));
     }
