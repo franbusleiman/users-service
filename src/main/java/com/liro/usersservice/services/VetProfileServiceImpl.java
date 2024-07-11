@@ -33,6 +33,7 @@ public class VetProfileServiceImpl implements VetProfileService {
                                  VetProfileMapper vetProfileMapper,
                                  RoleRepository roleRepository) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.vetProfileRepository = vetProfileRepository;
         this.vetProfileMapper = vetProfileMapper;
     }
