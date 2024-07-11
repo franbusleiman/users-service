@@ -11,6 +11,9 @@ public interface UserService {
 
     UserResponse findById(Long id);
 
+    UserResponse findByIdentificationNr(String id);
+
+
     UserCompleteResponse findByUsername(String username);
 
     UserResponse findByEmail(String email);

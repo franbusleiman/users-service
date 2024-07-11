@@ -35,6 +35,13 @@ public class UserController {
         return ResponseEntity.ok(userService.findById(id));
     }
 
+    @GetMapping(value = "/identificationNr/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserResponse> getUserByIdentificationNr(@PathVariable("id") String id) throws InterruptedException {
+
+        return ResponseEntity.ok(userService.findByIdentificationNr(id));
+    }
+
+
     @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserCompleteResponse> getUserByUsername(@PathVariable("username") String username) throws InterruptedException {
 

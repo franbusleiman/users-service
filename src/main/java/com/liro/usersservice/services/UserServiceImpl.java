@@ -43,6 +43,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse findByIdentificationNr(String id){
+        return userMapper.userToUserResponse(userRepository.findUserByIdentificationNr(id)
+                .orElseThrow(() -> new RuntimeException("Resource not found")));
+    }
+
+
+    @Override
     public UserCompleteResponse findByUsername(String username) {
         User user =  userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
