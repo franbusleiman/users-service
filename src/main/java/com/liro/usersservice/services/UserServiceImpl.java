@@ -37,8 +37,8 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserResponse findById(Long id) {
-        return userMapper.userToUserResponse(userRepository.findById(id)
+    public UserCompleteResponse findById(Long id) {
+        return userMapper.userToUseCompleteResponse(userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Resource not found")));
     }
 

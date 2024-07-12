@@ -30,7 +30,7 @@ public class UserController {
      Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> getUserById(@PathVariable("id") Long id) throws InterruptedException {
+    public ResponseEntity<UserCompleteResponse> getUserById(@PathVariable("id") Long id) throws InterruptedException {
 
         return ResponseEntity.ok(userService.findById(id));
     }
@@ -51,7 +51,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/getCurrent", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> getCurrentUser( @RequestHeader(name = "Authorization",  required = false) String token) throws InterruptedException {
+    public ResponseEntity<UserCompleteResponse> getCurrentUser( @RequestHeader(name = "Authorization",  required = false) String token) throws InterruptedException {
 
         logger.info("Getting user by username");
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface UserService {
 
-    UserResponse findById(Long id);
+    UserCompleteResponse findById(Long id);
 
     UserResponse findByIdentificationNr(String id);
 
