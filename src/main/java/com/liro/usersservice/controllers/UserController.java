@@ -101,7 +101,8 @@ public class UserController {
     }
 
     @PostMapping(value = "/client",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> createUserByVet(@RequestBody @Valid UserRegister userRegister, String token){
+    public ResponseEntity<UserResponse> createUserByVet(@RequestBody @Valid UserRegister userRegister,
+                                                        @RequestHeader(name = "Authorization", required = false) String token){
         UserResponse userResponse = userService.createUserByVet(userRegister, token);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
