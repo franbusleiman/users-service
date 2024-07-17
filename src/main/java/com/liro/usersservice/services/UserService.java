@@ -25,6 +25,8 @@ public interface UserService {
 
     UserResponse createUser(UserRegister user);
 
+    UserResponse createUserByVet(UserRegister user, String token);
+
     UserResponse changeUserState(User user, Long id);
 
     void deleteUser(Long id);

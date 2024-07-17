@@ -1,11 +1,10 @@
 package com.liro.usersservice.services;
 
 import brave.Tracer;
-import com.liro.usersservice.domain.dtos.users.UserCompleteResponse;
+import com.liro.usersservice.domain.dtos.users.*;
 import com.liro.usersservice.domain.model.Role;
 import com.liro.usersservice.domain.model.User;
-import com.liro.usersservice.domain.dtos.users.UserRegister;
-import com.liro.usersservice.domain.dtos.users.UserResponse;
+import com.liro.usersservice.exceptions.UnauthorizedException;
 import com.liro.usersservice.mappers.UserMapper;
 import com.liro.usersservice.persistance.RoleRepository;
 import com.liro.usersservice.persistance.UserRepository;
@@ -15,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.liro.usersservice.services.Util.getUser;
 
 
 @Service
@@ -97,6 +98,29 @@ public class UserServiceImpl implements UserService {
 
         return userMapper.userToUserResponse(userRepository.save(user));
     }
+
+    @Override
+    public UserResponse createUserByVet(UserRegister userRegister, String token){
+
+        JwtUserDTO userDTO = getUser(token);
+
+
+        if (!userDTO.getRoles().contains("ROLE_VET")){
+
+            throw new UnauthorizedException("The user is not authorized!");
+
+        }
+        User user = userMapper.userRegisterToUser(userRegister);
+        Optional<Role> role = roleRepository.findByName("ROLE_USER");
+        role.ifPresent(value -> user.getRoles().add(value));
+
+        user.setEnabled(false);
+
+        userRepository.save(user);
+
+        return userMapper.userToUserResponse(user);
+    }
+
 
     @Override
     public UserResponse changeUserState(User user, Long id) {

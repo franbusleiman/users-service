@@ -100,6 +100,18 @@ public class UserController {
         return ResponseEntity.created(location).body(user1);
     }
 
+    @PostMapping(value = "/client",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserResponse> createUserByVet(@RequestBody @Valid UserRegister userRegister, String token){
+        UserResponse userResponse = userService.createUserByVet(userRegister, token);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(userResponse.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(userResponse);
+    }
+
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> changeState(@RequestBody User user,
                                             @PathVariable("id") Long id){
