@@ -1,9 +1,8 @@
 package com.liro.usersservice.domain.dtos.users;
 
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.liro.usersservice.domain.dtos.address.AddressDTO;
 import com.liro.usersservice.domain.enums.Gender;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,7 @@ import java.time.LocalDate;
 @SuperBuilder
 @Getter
 @Setter
-public class UserRegister {
+public class ClientRegister {
 
     @NotBlank(message = "username must not be null")
     private String username;
@@ -35,11 +34,11 @@ public class UserRegister {
     private String areaPhoneNumber;
     @NotBlank(message = "identificationNr must not be null")
     private String identificationNr;
-    @NotBlank(message = "password must not be null")
-    private String password;
     @NotNull(message = "birthDate must not be null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
     @NotNull(message = "gender must not be null")
     private Gender gender;
+
+    private AddressDTO addressDTO;
 }

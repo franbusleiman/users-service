@@ -100,17 +100,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse createUserByVet(UserRegister userRegister, String token){
+    public UserResponse createUserByVet(ClientRegister userRegister, String token){
 
         JwtUserDTO userDTO = getUser(token);
-
 
         if (!userDTO.getRoles().contains("ROLE_VET")){
 
             throw new UnauthorizedException("The user is not authorized!");
 
         }
-        User user = userMapper.userRegisterToUser(userRegister);
+        User user = userMapper.clientRegisterToUser(userRegister);
         Optional<Role> role = roleRepository.findByName("ROLE_USER");
         role.ifPresent(value -> user.getRoles().add(value));
 

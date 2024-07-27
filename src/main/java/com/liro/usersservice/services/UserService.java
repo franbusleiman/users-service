@@ -1,5 +1,6 @@
 package com.liro.usersservice.services;
 
+import com.liro.usersservice.domain.dtos.users.ClientRegister;
 import com.liro.usersservice.domain.dtos.users.UserCompleteResponse;
 import com.liro.usersservice.domain.model.User;
 import com.liro.usersservice.domain.dtos.users.UserRegister;
@@ -25,7 +26,7 @@ public interface UserService {
 
     UserResponse createUser(UserRegister user);
 
-    UserResponse createUserByVet(UserRegister user, String token);
+    UserResponse createUserByVet(ClientRegister user, String token);
 
     UserResponse changeUserState(User user, Long id);
 

@@ -1,5 +1,6 @@
 package com.liro.usersservice.controllers;
 
+import com.liro.usersservice.domain.dtos.users.ClientRegister;
 import com.liro.usersservice.domain.dtos.users.UserCompleteResponse;
 import com.liro.usersservice.domain.model.User;
 import com.liro.usersservice.domain.dtos.users.UserRegister;
@@ -101,9 +102,9 @@ public class UserController {
     }
 
     @PostMapping(value = "/client",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> createUserByVet(@RequestBody @Valid UserRegister userRegister,
+    public ResponseEntity<UserResponse> createUserByVet(@RequestBody @Valid ClientRegister clientRegister,
                                                         @RequestHeader(name = "Authorization", required = false) String token){
-        UserResponse userResponse = userService.createUserByVet(userRegister, token);
+        UserResponse userResponse = userService.createUserByVet(clientRegister, token);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
