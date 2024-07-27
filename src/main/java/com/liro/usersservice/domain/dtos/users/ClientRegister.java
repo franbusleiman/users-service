@@ -40,5 +40,5 @@ public class ClientRegister {
     @NotNull(message = "gender must not be null")
     private Gender gender;
 
-    private AddressDTO addressDTO;
+    private AddressDTO address;
 }

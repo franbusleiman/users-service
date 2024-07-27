@@ -2,9 +2,11 @@ package com.liro.usersservice.services;
 
 import brave.Tracer;
 import com.liro.usersservice.domain.dtos.users.*;
+import com.liro.usersservice.domain.model.Address;
 import com.liro.usersservice.domain.model.Role;
 import com.liro.usersservice.domain.model.User;
 import com.liro.usersservice.exceptions.UnauthorizedException;
+import com.liro.usersservice.mappers.AddressMapper;
 import com.liro.usersservice.mappers.UserMapper;
 import com.liro.usersservice.persistance.RoleRepository;
 import com.liro.usersservice.persistance.UserRepository;
@@ -29,12 +31,16 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     Tracer tracer;
-
+    @Autowired
+    private  AddressMapper addressMapper;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     UserMapper userMapper = UserMapper.userMapper;
+
+
+
 
 
     @Override
@@ -114,6 +120,15 @@ public class UserServiceImpl implements UserService {
         role.ifPresent(value -> user.getRoles().add(value));
 
         user.setEnabled(false);
+
+        if (user.getAddresses() == null) {
+            user.setAddresses(new HashSet<>());
+        }
+
+        Address address = addressMapper.addressDtoToAddress(userRegister.getAddress());
+
+        address.setUser(user);
+        user.getAddresses().add(address);
 
         userRepository.save(user);
 

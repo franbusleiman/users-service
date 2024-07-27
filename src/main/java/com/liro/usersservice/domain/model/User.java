@@ -49,7 +49,7 @@ public class User implements Serializable {
             cascade = CascadeType.ALL,
             mappedBy = "user")
     private VetProfile vetProfile;
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "user")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<Address> addresses;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_roles",
