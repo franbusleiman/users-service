@@ -1,5 +1,4 @@
-DELETE FROM users
-WHERE id NOT IN (
+DELETE FROM users WHERE id NOT IN (
     SELECT MIN(id)
     FROM users
     GROUP BY identificationNr
