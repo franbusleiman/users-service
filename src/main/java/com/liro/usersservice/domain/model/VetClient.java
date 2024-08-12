@@ -27,5 +27,5 @@ public class VetClient {
     @JoinColumn(name = "vet_profiles_id", nullable = false)
     private VetProfile vetProfile;
 
-    private Long accountBalance;
+    private Double accountBalance;
 }

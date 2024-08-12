@@ -2,14 +2,14 @@ package com.liro.usersservice.services;
 
 import brave.Tracer;
 import com.liro.usersservice.domain.dtos.users.*;
-import com.liro.usersservice.domain.model.Address;
-import com.liro.usersservice.domain.model.Role;
-import com.liro.usersservice.domain.model.User;
+import com.liro.usersservice.domain.model.*;
 import com.liro.usersservice.exceptions.UnauthorizedException;
 import com.liro.usersservice.mappers.AddressMapper;
 import com.liro.usersservice.mappers.UserMapper;
 import com.liro.usersservice.persistance.RoleRepository;
 import com.liro.usersservice.persistance.UserRepository;
+import com.liro.usersservice.persistance.VetClientRepository;
+import com.liro.usersservice.persistance.VetProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +25,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    VetProfileRepository vetProfileRepository;
+
+    @Autowired
+    VetClientRepository vetClientRepository;
+
 
     @Autowired
     RoleRepository roleRepository;
@@ -109,12 +115,15 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUserByVet(ClientRegister userRegister, String token){
 
         JwtUserDTO userDTO = getUser(token);
+        VetProfile vetProfile = vetProfileRepository.findById(userDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Resource not found"));
 
         if (!userDTO.getRoles().contains("ROLE_VET")){
 
             throw new UnauthorizedException("The user is not authorized!");
 
         }
+
         User user = userMapper.clientRegisterToUser(userRegister);
         Optional<Role> role = roleRepository.findByName("ROLE_USER");
         role.ifPresent(value -> user.getRoles().add(value));
@@ -130,7 +139,13 @@ public class UserServiceImpl implements UserService {
         address.setUser(user);
         user.getAddresses().add(address);
 
-        userRepository.save(user);
+        VetClient vetClient = VetClient.builder()
+                .vetProfile(vetProfile)
+                .user(user)
+                .accountBalance(0.0)
+                .build();
+
+        vetClientRepository.save(vetClient);
 
         return userMapper.userToUserResponse(user);
     }
