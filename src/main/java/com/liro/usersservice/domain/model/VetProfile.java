@@ -3,6 +3,8 @@ package com.liro.usersservice.domain.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "vet_profiles")
@@ -25,4 +27,7 @@ public class VetProfile  {
             optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vet_profile")
+    private Set<VetClient> vetClients;
 }
