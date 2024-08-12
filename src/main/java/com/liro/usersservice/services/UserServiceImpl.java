@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUserByVet(ClientRegister userRegister, String token){
 
         JwtUserDTO userDTO = getUser(token);
-        VetProfile vetProfile = vetProfileRepository.findById(userDTO.getId())
+        VetProfile vetProfile = vetProfileRepository.findByUserId(userDTO.getId())
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
 
         if (!userDTO.getRoles().contains("ROLE_VET")){
