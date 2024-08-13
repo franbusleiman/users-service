@@ -57,4 +57,7 @@ public class User implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "roles_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private Set<VetClient> vetClients;
+
 }

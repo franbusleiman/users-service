@@ -1,7 +1,12 @@
 package com.liro.usersservice.persistance;
 
 import com.liro.usersservice.domain.model.User;
+import com.liro.usersservice.domain.model.VetClient;
+import com.liro.usersservice.domain.model.VetProfile;
 import org.springframework.data.jpa.domain.Specification;
+
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 
 public class UserSpecifications {
@@ -23,6 +28,10 @@ public class UserSpecifications {
     }
 
     public static Specification<User> hasVetId(Long vetId) {
-        return (root, query, cb) -> cb.equal(root.get("vetId"), vetId);
+        return (root, query, cb) -> {
+            Join<User, VetClient> vetClientJoin = root.join("vetClients", JoinType.INNER);
+            Join<VetClient, VetProfile> vetProfileJoin = vetClientJoin.join("vetProfile", JoinType.INNER);
+            return cb.equal(vetProfileJoin.get("user").get("id"), vetId);
+        };
     }
 }
