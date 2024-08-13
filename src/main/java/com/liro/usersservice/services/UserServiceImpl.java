@@ -6,13 +6,14 @@ import com.liro.usersservice.domain.model.*;
 import com.liro.usersservice.exceptions.UnauthorizedException;
 import com.liro.usersservice.mappers.AddressMapper;
 import com.liro.usersservice.mappers.UserMapper;
-import com.liro.usersservice.persistance.RoleRepository;
-import com.liro.usersservice.persistance.UserRepository;
-import com.liro.usersservice.persistance.VetClientRepository;
-import com.liro.usersservice.persistance.VetProfileRepository;
+import com.liro.usersservice.persistance.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,15 +39,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     Tracer tracer;
     @Autowired
-    private  AddressMapper addressMapper;
+    private AddressMapper addressMapper;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     UserMapper userMapper = UserMapper.userMapper;
-
-
-
 
 
     @Override
@@ -56,7 +54,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse findByIdentificationNr(String id){
+    public UserResponse findByIdentificationNr(String id) {
         System.out.println("buscando by identification nr: " + id);
         return userMapper.userToUserResponse(userRepository.findUserByIdentificationNr(id)
                 .orElseThrow(() -> new RuntimeException("Resource not found")));
@@ -65,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserCompleteResponse findByUsername(String username) {
-        User user =  userRepository.findUserByUsername(username)
+        User user = userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
         return userMapper.userToUseCompleteResponse(user);
 
@@ -73,7 +71,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse findByEmail(String email) {
-        User user =  userRepository.findUserByEmail(email)
+        User user = userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
         return userMapper.userToUserResponse(user);
     }
@@ -89,10 +87,44 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponse> findAll() {
-        return userRepository.findAll().stream()
-                .map(user -> userMapper.userToUserResponse(user))
-                .collect(Collectors.toList());
+    public Page<UserResponse> findAll(Pageable pageable, String param, JwtUserDTO userDTO) {
+
+        if (!userDTO.getRoles().contains("ROLE_VET")) {
+
+            throw new UnauthorizedException("The user is not authorized!");
+
+        }
+        Long vetId = userDTO.getId();
+
+        Specification<User> spec = Specification.where(null);
+
+        if (StringUtils.hasText(param)) {
+            try {
+                Long dni = Long.parseLong(param);
+                spec = spec.and(UserSpecifications.hasDni(dni));
+            } catch (NumberFormatException e) {
+                String[] partes = param.split(" ");
+
+                if (partes.length > 1) {
+                    String nombre = String.join(" ", Arrays.copyOfRange(partes, 0, partes.length - 1));
+                    String apellido = partes[partes.length - 1];
+                    spec = spec.or(UserSpecifications.containsName(nombre)
+                            .and(UserSpecifications.containsSurname(apellido))
+                            .and(UserSpecifications.hasVetId(vetId)));
+                    ;
+                } else {
+                    spec = spec.or(UserSpecifications.hasEmail(param));
+                    spec = spec.or(UserSpecifications.containsName(param))
+                            .and(UserSpecifications.hasVetId(vetId));
+                    spec = spec.or(UserSpecifications.containsSurname(param))
+                            .and(UserSpecifications.hasVetId(vetId));
+                    ;
+                }
+            }
+        }
+
+        return userRepository.findAll(spec, pageable)
+                .map(user -> userMapper.userToUserResponse(user));
     }
 
     @Override
@@ -112,13 +144,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse createUserByVet(ClientRegister userRegister, String token){
+    public UserResponse createUserByVet(ClientRegister userRegister, String token) {
 
         JwtUserDTO userDTO = getUser(token);
         VetProfile vetProfile = vetProfileRepository.findByUserId(userDTO.getId())
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
 
-        if (!userDTO.getRoles().contains("ROLE_VET")){
+        if (!userDTO.getRoles().contains("ROLE_VET")) {
 
             throw new UnauthorizedException("The user is not authorized!");
 
@@ -159,7 +191,7 @@ public class UserServiceImpl implements UserService {
         user1.setIntents(user.getIntents());
         user1.setEnabled(user.isEnabled());
 
-            tracer.currentSpan().tag("state.change", String.valueOf(user1.isEnabled()));
+        tracer.currentSpan().tag("state.change", String.valueOf(user1.isEnabled()));
 
         userRepository.save(user1);
 

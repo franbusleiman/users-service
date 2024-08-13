@@ -6,15 +6,23 @@ import com.liro.usersservice.domain.model.User;
 import com.liro.usersservice.domain.dtos.users.UserRegister;
 import com.liro.usersservice.domain.dtos.users.UserResponse;
 import com.liro.usersservice.services.UserService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.net.URI;
 import java.util.List;
 
@@ -81,12 +89,6 @@ public class UserController {
         return ResponseEntity.ok(userService.existsByIdentificationNr(identificationNr));
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserResponse>> getUsers(){
-
-        return ResponseEntity.ok(userService.findAll());
-    }
-
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> createUser( @RequestBody @Valid  UserRegister userRegister){
 
@@ -127,5 +129,25 @@ public class UserController {
         userService.deleteUser(id);
 
         return ResponseEntity.ok().build();
+    }
+
+    @ApiPageable
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Page<UserResponse>> getUserBySearchCriteria(Pageable pageable,
+                                                                                   @RequestParam("param") String param,
+                                                                                   @RequestHeader(name = "Authorization", required = false) String token) {
+
+
+         return ResponseEntity.ok(userService.findAll(pageable, param, getUser(token)));
+    }
+
+    @Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE, ElementType.TYPE })
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", dataType = "int", paramType = "query", value = "Results page you want to retrieve (0..N)"),
+            @ApiImplicitParam(name = "size", dataType = "int", paramType = "query", value = "Number of records per page."),
+            @ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query", value = "Sorting criteria in the format: property(,asc|desc). "
+                    + "Default sort order is ascending. " + "Multiple sort criteria are supported.") })
+    @interface ApiPageable {
     }
 }
