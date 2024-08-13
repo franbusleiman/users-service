@@ -23,8 +23,8 @@ public class UserSpecifications {
         return (root, query, cb) -> cb.equal(root.get("identificationNr"), identificationNr);
     }
 
-    public static Specification<User> hasEmail(String email) {
-        return (root, query, cb) -> cb.equal(cb.lower(root.get("email")), email.toLowerCase());
+    public static Specification<User> containsEmail(String email) {
+        return (root, query, cb) -> cb.like(cb.lower(root.get("email")), email.toLowerCase());
     }
 
     public static Specification<User> hasVetId(Long vetId) {

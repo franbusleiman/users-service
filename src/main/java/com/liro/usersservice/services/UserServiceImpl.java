@@ -113,12 +113,16 @@ public class UserServiceImpl implements UserService {
                             .and(UserSpecifications.hasVetId(vetId)));
                     ;
                 } else {
-                    spec = spec.or(UserSpecifications.hasEmail(param));
-                    spec = spec.or(UserSpecifications.containsName(param))
-                            .and(UserSpecifications.hasVetId(vetId));
-                    spec = spec.or(UserSpecifications.containsSurname(param))
-                            .and(UserSpecifications.hasVetId(vetId));
-                    ;
+
+                    if(param.contains("@")){
+                        spec = spec.or(UserSpecifications.containsEmail(param));
+                    }
+                    else{
+                        spec = spec.or(UserSpecifications.containsName(param))
+                                .and(UserSpecifications.hasVetId(vetId));
+                        spec = spec.or(UserSpecifications.containsSurname(param))
+                                .and(UserSpecifications.hasVetId(vetId));
+                    }
                 }
             }
         }
