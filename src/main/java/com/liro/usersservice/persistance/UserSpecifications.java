@@ -24,7 +24,7 @@ public class UserSpecifications {
     }
 
     public static Specification<User> containsEmail(String email) {
-        return (root, query, cb) -> cb.like(cb.lower(root.get("email")), email.toLowerCase());
+        return (root, query, cb) -> cb.like(cb.lower(root.get("email")),"%" + email.toLowerCase()+ "%");
     }
 
     public static Specification<User> hasVetId(Long vetId) {
