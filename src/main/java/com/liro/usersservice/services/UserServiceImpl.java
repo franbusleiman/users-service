@@ -106,12 +106,14 @@ public class UserServiceImpl implements UserService {
                 String[] partes = param.split(" ");
 
                 if (partes.length > 1) {
-                    String nombre = String.join(" ", Arrays.copyOfRange(partes, 0, partes.length - 1));
+                    for (int i = 1; i < partes.length; i++) {
+
+                        String nombre = String.join(" ", Arrays.copyOfRange(partes, 0, partes.length - 1));
                     String apellido = partes[partes.length - 1];
                     spec = spec.or(UserSpecifications.containsName(nombre)
                             .and(UserSpecifications.containsSurname(apellido))
                             .and(UserSpecifications.hasVetId(vetId)));
-                    ;
+                    ;}
                 } else {
 
                     if(param.contains("@")){
