@@ -1,10 +1,7 @@
 package com.liro.usersservice.controllers;
 
-import com.liro.usersservice.domain.dtos.users.ClientRegister;
-import com.liro.usersservice.domain.dtos.users.UserCompleteResponse;
+import com.liro.usersservice.domain.dtos.users.*;
 import com.liro.usersservice.domain.model.User;
-import com.liro.usersservice.domain.dtos.users.UserRegister;
-import com.liro.usersservice.domain.dtos.users.UserResponse;
 import com.liro.usersservice.services.UserService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -133,9 +130,9 @@ public class UserController {
 
     @ApiPageable
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Page<UserResponse>> getUserBySearchCriteria(Pageable pageable,
-                                                                                   @RequestParam("param") String param,
-                                                                                   @RequestHeader(name = "Authorization", required = false) String token) {
+    public ResponseEntity<Page<UserAnimalsResponse>> getUserBySearchCriteria(Pageable pageable,
+                                                                             @RequestParam("param") String param,
+                                                                             @RequestHeader(name = "Authorization", required = false) String token) {
 
 
          return ResponseEntity.ok(userService.findAll(pageable, param, getUser(token)));

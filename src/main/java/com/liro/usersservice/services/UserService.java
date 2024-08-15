@@ -21,7 +21,7 @@ public interface UserService {
     Boolean existsByEmail(String email);
     Boolean existsByIdentificationNr(String identificationNr);
 
-    Page<UserResponse> findAll(Pageable pageable, String param, JwtUserDTO userDTO);
+    Page<UserAnimalsResponse> findAll(Pageable pageable, String param, JwtUserDTO userDTO);
 
     UserResponse createUser(UserRegister user);
 

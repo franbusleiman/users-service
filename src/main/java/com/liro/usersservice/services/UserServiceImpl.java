@@ -1,6 +1,7 @@
 package com.liro.usersservice.services;
 
 import brave.Tracer;
+import com.liro.usersservice.configuration.FeignAnimalsClient;
 import com.liro.usersservice.domain.dtos.users.*;
 import com.liro.usersservice.domain.model.*;
 import com.liro.usersservice.exceptions.UnauthorizedException;
@@ -35,7 +36,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     RoleRepository roleRepository;
-
+    @Autowired
+    FeignAnimalsClient animalsClient;
     @Autowired
     Tracer tracer;
     @Autowired
@@ -87,7 +89,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserResponse> findAll(Pageable pageable, String param, JwtUserDTO userDTO) {
+    public Page<UserAnimalsResponse> findAll(Pageable pageable, String param, JwtUserDTO userDTO) {
 
         if (!userDTO.getRoles().contains("ROLE_VET")) {
 
@@ -130,7 +132,11 @@ public class UserServiceImpl implements UserService {
         }
 
         return userRepository.findAll(spec, pageable)
-                .map(user -> userMapper.userToUserResponse(user));
+                .map(user ->{
+                   UserAnimalsResponse userAnimalsResponse = userMapper.userToUserAnimalsResponse(user);
+                   userAnimalsResponse.setAnimals(animalsClient.getUserAnimals(user.getId()).getBody());
+                   return userAnimalsResponse;
+                });
     }
 
     @Override

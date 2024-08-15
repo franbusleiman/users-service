@@ -22,5 +22,8 @@ public interface UserMapper {
 
     UserCompleteResponse userToUseCompleteResponse(User user);
 
+    UserAnimalsResponse userToUserAnimalsResponse(User user);
+
+
     User clientRegisterToUser(ClientRegister clientRegister);
 }
