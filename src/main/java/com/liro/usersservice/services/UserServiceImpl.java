@@ -194,6 +194,42 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserResponse(user);
     }
 
+    @Override
+    public Void createUsersByVetMigrator(List<ClientRegister> clients, Long vetUserId) {
+
+        VetProfile vetProfile = vetProfileRepository.findByUserId(vetUserId)
+                .orElseThrow(() -> new RuntimeException("Resource not found"));
+
+
+        clients.forEach(clientRegister -> {
+
+            User user = userMapper.clientRegisterToUser(clientRegister);
+            Optional<Role> role = roleRepository.findByName("ROLE_USER");
+            role.ifPresent(value -> user.getRoles().add(value));
+
+            user.setEnabled(false);
+
+            if (user.getAddresses() == null) {
+                user.setAddresses(new HashSet<>());
+            }
+
+            Address address = addressMapper.addressDtoToAddress(clientRegister.getAddress());
+
+            address.setUser(user);
+            user.getAddresses().add(address);
+
+            VetClient vetClient = VetClient.builder()
+                    .vetProfile(vetProfile)
+                    .user(user)
+                    .accountBalance(clientRegister.getSaldo())
+                    .build();
+
+            vetClientRepository.save(vetClient);
+        });
+
+        return null;
+    }
+
 
     @Override
     public UserResponse changeUserState(User user, Long id) {

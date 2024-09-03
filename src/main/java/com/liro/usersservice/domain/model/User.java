@@ -28,13 +28,11 @@ public class User implements Serializable {
     @Column(unique = true)
     private String username;
     private String password;
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String identificationNr;
-    @Column(nullable = false)
     private LocalDate birthDate;
     @Column(nullable = false)
     private Gender gender;
-    @Column(nullable = false)
     private String email;
     private String name;
     private String surname;

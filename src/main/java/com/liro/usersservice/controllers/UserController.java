@@ -113,6 +113,15 @@ public class UserController {
         return ResponseEntity.created(location).body(userResponse);
     }
 
+
+    @PostMapping(value = "/clients",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> createUserByVetMigrator(@RequestBody @Valid List<ClientRegister> clientRegisters,
+                                                                @RequestParam("vetUserId") Long vetUserId){
+        userService.createUsersByVetMigrator(clientRegisters, vetUserId);
+
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> changeState(@RequestBody User user,
                                             @PathVariable("id") Long id){

@@ -41,4 +41,6 @@ public class ClientRegister {
     private Gender gender;
 
     private AddressDTO address;
+    private Double saldo;
+
 }
