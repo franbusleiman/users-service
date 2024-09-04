@@ -31,7 +31,6 @@ public class User implements Serializable {
     @Column(unique = true)
     private String identificationNr;
     private LocalDate birthDate;
-    @Column(nullable = false)
     private Gender gender;
     private String email;
     private String name;
