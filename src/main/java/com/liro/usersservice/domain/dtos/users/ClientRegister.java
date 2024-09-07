@@ -42,5 +42,6 @@ public class ClientRegister {
 
     private AddressDTO address;
     private Double saldo;
+    private Long codigo;
 
 }

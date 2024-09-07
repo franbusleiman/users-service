@@ -218,6 +218,8 @@ public class UserServiceImpl implements UserService {
             address.setUser(user);
             user.getAddresses().add(address);
 
+            user.setCodigoVetter(vetUserId + "-" + clientRegister.getCodigo());
+
             VetClient vetClient = VetClient.builder()
                     .vetProfile(vetProfile)
                     .user(user)
