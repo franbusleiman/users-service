@@ -21,4 +21,6 @@ public class UserResponse  extends UserDTO {
     private Long id;
     private List<Role> roles;
     private Set<AddressDTO> addresses;
+
+    private String codigoVetter;
 }

@@ -195,11 +195,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Void createUsersByVetMigrator(List<ClientRegister> clients, Long vetUserId) {
+    public List<UserResponse> createUsersByVetMigrator(List<ClientRegister> clients, Long vetUserId) {
 
         VetProfile vetProfile = vetProfileRepository.findByUserId(vetUserId)
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
 
+        List<UserResponse> response = new ArrayList<>();
 
         clients.forEach(clientRegister -> {
 
@@ -227,9 +228,10 @@ public class UserServiceImpl implements UserService {
                     .build();
 
             vetClientRepository.save(vetClient);
+            response.add(userMapper.userToUserResponse(user));
         });
 
-        return null;
+        return response;
     }
 
 

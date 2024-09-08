@@ -115,7 +115,7 @@ public class UserController {
 
 
     @PostMapping(value = "/clients",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createUserByVetMigrator(@RequestBody @Valid List<ClientRegister> clientRegisters,
+    public ResponseEntity<List<UserResponse>> createUserByVetMigrator(@RequestBody @Valid List<ClientRegister> clientRegisters,
                                                                 @RequestParam("vetUserId") Long vetUserId){
         userService.createUsersByVetMigrator(clientRegisters, vetUserId);
 
