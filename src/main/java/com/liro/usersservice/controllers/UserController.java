@@ -33,7 +33,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-     Logger logger = LoggerFactory.getLogger(UserController.class);
+    Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserCompleteResponse> getUserById(@PathVariable("id") Long id) throws InterruptedException {
@@ -57,7 +57,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/getCurrent", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserCompleteResponse> getCurrentUser( @RequestHeader(name = "Authorization",  required = false) String token) throws InterruptedException {
+    public ResponseEntity<UserCompleteResponse> getCurrentUser(@RequestHeader(name = "Authorization", required = false) String token) throws InterruptedException {
 
         logger.info("Getting user by username");
 
@@ -65,7 +65,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> getUserByEmail(@PathVariable("email") String email)  {
+    public ResponseEntity<UserResponse> getUserByEmail(@PathVariable("email") String email) {
 
         logger.info("Getting user by username");
 
@@ -73,21 +73,21 @@ public class UserController {
     }
 
     @GetMapping(value = "/existsByEmail/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> existsByEmail(@PathVariable("email") String email)  {
+    public ResponseEntity<Boolean> existsByEmail(@PathVariable("email") String email) {
 
 
         return ResponseEntity.ok(userService.existsByEmail(email));
     }
 
     @GetMapping(value = "/existsByIdentificationNr/{identificationNr}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> existsByIdentificationNr(@PathVariable("identificationNr") String identificationNr)  {
+    public ResponseEntity<Boolean> existsByIdentificationNr(@PathVariable("identificationNr") String identificationNr) {
 
 
         return ResponseEntity.ok(userService.existsByIdentificationNr(identificationNr));
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> createUser( @RequestBody @Valid  UserRegister userRegister){
+    public ResponseEntity<UserResponse> createUser(@RequestBody @Valid UserRegister userRegister) {
 
         UserResponse user1 = userService.createUser(userRegister);
 
@@ -100,9 +100,9 @@ public class UserController {
         return ResponseEntity.created(location).body(user1);
     }
 
-    @PostMapping(value = "/client",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/client", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> createUserByVet(@RequestBody @Valid ClientRegister clientRegister,
-                                                        @RequestHeader(name = "Authorization", required = false) String token){
+                                                        @RequestHeader(name = "Authorization", required = false) String token) {
         UserResponse userResponse = userService.createUserByVet(clientRegister, token);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -114,23 +114,22 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "/clients",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/clients", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserResponse>> createUserByVetMigrator(@RequestBody @Valid List<ClientRegister> clientRegisters,
-                                                                @RequestParam("vetUserId") Long vetUserId){
-        userService.createUsersByVetMigrator(clientRegisters, vetUserId);
+                                                                      @RequestParam("vetUserId") Long vetUserId) {
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(userService.createUsersByVetMigrator(clientRegisters, vetUserId));
     }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> changeState(@RequestBody User user,
-                                            @PathVariable("id") Long id){
+                                                    @PathVariable("id") Long id) {
 
-       return ResponseEntity.ok(userService.changeUserState(user, id));
+        return ResponseEntity.ok(userService.changeUserState(user, id));
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id){
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
 
         userService.deleteUser(id);
 
@@ -144,16 +143,16 @@ public class UserController {
                                                                              @RequestHeader(name = "Authorization", required = false) String token) {
 
 
-         return ResponseEntity.ok(userService.findAll(pageable, param, getUser(token)));
+        return ResponseEntity.ok(userService.findAll(pageable, param, getUser(token)));
     }
 
-    @Target({ ElementType.METHOD, ElementType.ANNOTATION_TYPE, ElementType.TYPE })
+    @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE, ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "int", paramType = "query", value = "Results page you want to retrieve (0..N)"),
             @ApiImplicitParam(name = "size", dataType = "int", paramType = "query", value = "Number of records per page."),
             @ApiImplicitParam(name = "sort", allowMultiple = true, dataType = "string", paramType = "query", value = "Sorting criteria in the format: property(,asc|desc). "
-                    + "Default sort order is ascending. " + "Multiple sort criteria are supported.") })
+                    + "Default sort order is ascending. " + "Multiple sort criteria are supported.")})
     @interface ApiPageable {
     }
 }
