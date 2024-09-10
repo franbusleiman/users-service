@@ -228,9 +228,11 @@ public class UserServiceImpl implements UserService {
                     .build();
 
             vetClientRepository.save(vetClient);
+            System.out.println("paso: " + userMapper.userToUserResponse(user));
             response.add(userMapper.userToUserResponse(user));
         });
 
+        response.forEach(response1-> System.out.println(response1));
         return response;
     }
 
