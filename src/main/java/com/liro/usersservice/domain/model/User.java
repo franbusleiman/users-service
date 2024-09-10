@@ -37,6 +37,8 @@ public class User implements Serializable {
     private String surname;
     private String phoneNumber;
     private String areaPhoneNumber;
+
+    @Column(unique = true)
     private String codigoVetter;
 
     @Column(name = "is_enabled")
