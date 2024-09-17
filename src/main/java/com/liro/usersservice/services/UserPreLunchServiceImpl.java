@@ -10,10 +10,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserPreLunchServiceImpl implements UserPreLunchService{
-
-    @Autowired(required=true)
-    UserPreLunch userPreLunch;
-
     @Autowired
     UserPreLunchRepository userPreLunchRepository;
 
