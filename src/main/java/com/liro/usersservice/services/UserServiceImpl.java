@@ -33,6 +33,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     VetClientRepository vetClientRepository;
 
+    @Autowired
+    UserPreLunchRepository userPreLunchRepository;
 
     @Autowired
     RoleRepository roleRepository;

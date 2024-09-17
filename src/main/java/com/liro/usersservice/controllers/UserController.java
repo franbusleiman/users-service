@@ -121,6 +121,7 @@ public class UserController {
         return ResponseEntity.ok().body(userService.createUsersByVetMigrator(clientRegisters, vetUserId));
     }
 
+
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> changeState(@RequestBody User user,
                                                     @PathVariable("id") Long id) {
