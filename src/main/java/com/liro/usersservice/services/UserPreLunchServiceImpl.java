@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserPreLunchServiceImpl implements UserPreLunchService{
 
-    @Autowired
+    @Autowired(required=true)
     UserPreLunch userPreLunch;
 
     @Autowired
