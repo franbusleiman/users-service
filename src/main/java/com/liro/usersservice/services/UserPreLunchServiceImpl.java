@@ -22,7 +22,7 @@ public class UserPreLunchServiceImpl implements UserPreLunchService{
     @Override
     public UserPreLunchResponse createUserPreLunch(UserPreLunchRegister userPreLunchRegister) {
 
-        if (!userPreLunchRegister.getName().contains("@")){
+        if (!userPreLunchRegister.getEmail().contains("@")){
             throw new IllegalArgumentException("Enter a valid email.");
         }else {
         UserPreLunch userPreLunch1 = userPreLunchMapper.userPreLunchRegisterToUserPreLunch(userPreLunchRegister);
