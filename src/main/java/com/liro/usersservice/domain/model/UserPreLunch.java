@@ -17,12 +17,13 @@ import javax.validation.constraints.Null;
 @SuperBuilder
 @Getter
 @Setter
-@Table
+@Table(name = "users_prelunch")
 public class UserPreLunch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String email;
 
     private String name;

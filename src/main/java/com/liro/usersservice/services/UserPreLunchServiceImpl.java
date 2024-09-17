@@ -22,13 +22,12 @@ public class UserPreLunchServiceImpl implements UserPreLunchService{
     @Override
     public UserPreLunchResponse createUserPreLunch(UserPreLunchRegister userPreLunchRegister) {
 
-        if (!StringUtils.hasText(userPreLunchRegister.getEmail()) || !StringUtils.hasText(userPreLunchRegister.getName())){
-            throw new RuntimeException("Fields cannot be empty");
-        }
-
+        if (!userPreLunchRegister.getName().contains("@")){
+            throw new RuntimeException("Enter a valid email.");
+        }else {
         UserPreLunch userPreLunch1 = userPreLunchMapper.userPreLunchRegisterToUserPreLunch(userPreLunchRegister);
-
             return userPreLunchMapper.userPreLunchToUserPreLunchResponse(userPreLunchRepository.save(userPreLunch1));
+        }
     }
 
 }
