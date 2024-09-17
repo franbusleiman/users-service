@@ -11,6 +11,6 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class UserPreLunchResponse extends UserPreLunchDTO{
+public class UserPreLunchResponse extends UserPreLunchRegister{
     private Long id;
 }
