@@ -5,6 +5,6 @@ import com.liro.usersservice.domain.dtos.usersPreLunch.UserPreLunchResponse;
 
 public interface UserPreLunchService {
 
-    public UserPreLunchResponse createUserPreLunch(UserPreLunchRegister userPreLunchRegister);
+    UserPreLunchResponse createUserPreLunch(UserPreLunchRegister userPreLunchRegister);
 
 }

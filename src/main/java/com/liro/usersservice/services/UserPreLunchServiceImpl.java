@@ -16,7 +16,6 @@ public class UserPreLunchServiceImpl implements UserPreLunchService{
 
     @Autowired
     UserPreLunchMapper userPreLunchMapper;
-    ;
 
 
     @Override

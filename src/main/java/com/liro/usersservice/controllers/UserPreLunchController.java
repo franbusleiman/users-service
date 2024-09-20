@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-@RestController
 @RequestMapping("/prelunch")
+@RestController
 public class UserPreLunchController {
 
     @Autowired

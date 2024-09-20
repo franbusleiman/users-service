@@ -34,9 +34,6 @@ public class UserServiceImpl implements UserService {
     VetClientRepository vetClientRepository;
 
     @Autowired
-    UserPreLunchRepository userPreLunchRepository;
-
-    @Autowired
     RoleRepository roleRepository;
     @Autowired
     FeignAnimalsClient animalsClient;
