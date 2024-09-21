@@ -24,7 +24,7 @@ public class UserPreLunchController {
     @Autowired
     UserPreLunchMapper userPreLunchMapper;
 
-    @PostMapping(value = "/create",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserPreLunchResponse> createUserPreLunch(@RequestBody @Valid UserPreLunchRegister userPreLunchRegister){
         return ResponseEntity.ok().body(userPreLunchService.createUserPreLunch(userPreLunchRegister));
     }
