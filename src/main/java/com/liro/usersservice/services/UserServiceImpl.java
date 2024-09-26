@@ -100,13 +100,22 @@ public class UserServiceImpl implements UserService {
         Specification<User> spec = Specification.where(null);
 
         if (StringUtils.hasText(param)) {
+
+            System.out.println("Encontro param: " + param);
             try {
+                System.out.println("Ingreso dni param: " + param);
+
                 Long dni = Long.parseLong(param);
                 spec = spec.and(UserSpecifications.hasDni(dni));
             } catch (NumberFormatException e) {
+
+                System.out.println("Ingreso partes 1: " + param);
+
                 String[] partes = param.split(" ");
 
                 if (partes.length > 1) {
+                    System.out.println("Ingreso partes 2: " + param);
+
                     for (int i = 1; i < partes.length; i++) {
 
                         String nombre = String.join(" ", Arrays.copyOfRange(partes, 0, partes.length - 1));
@@ -116,11 +125,16 @@ public class UserServiceImpl implements UserService {
                             .and(UserSpecifications.hasVetId(vetId)));
                     ;}
                 } else {
+                    System.out.println("Ingreso partes 3: " + param);
 
                     if(param.contains("@")){
+                        System.out.println("Ingreso partes 4: " + param);
+
                         spec = spec.or(UserSpecifications.containsEmail(param));
                     }
                     else{
+                        System.out.println("Ingreso partes 5: " + param);
+
                         spec = spec.or(UserSpecifications.containsName(param))
                                 .and(UserSpecifications.hasVetId(vetId));
                         spec = spec.or(UserSpecifications.containsSurname(param))
@@ -129,6 +143,8 @@ public class UserServiceImpl implements UserService {
                 }
             }
         }
+
+        System.out.println("Salio con specs: " + spec);
 
         return userRepository.findAll(spec, pageable)
                 .map(user ->{
