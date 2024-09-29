@@ -71,10 +71,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse findByEmail(String email) {
+    public UserCompleteResponse findByEmail(String email) {
         User user = userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
-        return userMapper.userToUserResponse(user);
+        return userMapper.userToUseCompleteResponse(user);
     }
 
     @Override

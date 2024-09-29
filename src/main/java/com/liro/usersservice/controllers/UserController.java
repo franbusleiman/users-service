@@ -65,7 +65,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserResponse> getUserByEmail(@PathVariable("email") String email) {
+    public ResponseEntity<UserCompleteResponse> getUserByEmail(@PathVariable("email") String email) {
 
         logger.info("Getting user by username");
 

@@ -16,7 +16,7 @@ public interface UserService {
 
     UserCompleteResponse findByUsername(String username);
 
-    UserResponse findByEmail(String email);
+    UserCompleteResponse findByEmail(String email);
 
     Boolean existsByEmail(String email);
     Boolean existsByIdentificationNr(String identificationNr);
