@@ -34,4 +34,8 @@ public class UserSpecifications {
             return cb.equal(vetProfileJoin.get("user").get("id"), vetId);
         };
     }
+
+    public static Specification<User> isEnabled(Boolean enabled){
+        return (root, query, cb) -> cb.equal(root.get("isEnabled"), enabled);
+    }
 }
