@@ -99,6 +99,7 @@ public class UserServiceImpl implements UserService {
 
         Specification<User> spec = Specification.where(null);
         spec = spec.and(UserSpecifications.isEnabled(true));
+        spec = spec.and(UserSpecifications.hasVetId(vetId));
 
         if (StringUtils.hasText(param)) {
 
