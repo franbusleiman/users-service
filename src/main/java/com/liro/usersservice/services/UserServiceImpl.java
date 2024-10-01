@@ -99,7 +99,6 @@ public class UserServiceImpl implements UserService {
         Boolean lot = false;
 
         Specification<User> spec = Specification.where(null);
-        spec = spec.and(UserSpecifications.hasVetId(vetId));
 
         if (StringUtils.hasText(param)) {
 
