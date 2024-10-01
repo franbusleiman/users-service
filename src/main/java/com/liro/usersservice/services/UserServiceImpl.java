@@ -96,6 +96,7 @@ public class UserServiceImpl implements UserService {
 
         }
         Long vetId = userDTO.getId();
+        Boolean lot = false;
 
         Specification<User> spec = Specification.where(null);
         spec = spec.and(UserSpecifications.hasVetId(vetId));
@@ -108,12 +109,12 @@ public class UserServiceImpl implements UserService {
 
                 Long dni = Long.parseLong(param);
                 spec = spec.and(UserSpecifications.hasDni(dni));
+                lot = true;
             } catch (NumberFormatException e) {
 
                 System.out.println("Ingreso partes 1: " + param);
 
                 String[] partes = param.split(" ");
-
                 if (partes.length > 1) {
                     System.out.println("Ingreso partes 2: " + param);
 
@@ -125,6 +126,7 @@ public class UserServiceImpl implements UserService {
                                 .and(UserSpecifications.containsSurname(apellido))
                                 .and(UserSpecifications.hasVetId(vetId)));
                         ;
+                        lot = true;
                     }
                 } else {
                     System.out.println("Ingreso partes 3: " + param);
@@ -133,6 +135,8 @@ public class UserServiceImpl implements UserService {
                         System.out.println("Ingreso partes 4: " + param);
 
                         spec = spec.or(UserSpecifications.containsEmail(param));
+                        lot = true;
+
                     } else {
                         System.out.println("Ingreso partes 5: " + param);
 
@@ -140,6 +144,8 @@ public class UserServiceImpl implements UserService {
                                 .and(UserSpecifications.hasVetId(vetId));
                         spec = spec.or(UserSpecifications.containsSurname(param))
                                 .and(UserSpecifications.hasVetId(vetId));
+                        lot = true;
+
                     }
                 }
             }
@@ -147,7 +153,7 @@ public class UserServiceImpl implements UserService {
         }
         System.out.println("Salio con specs: " + spec);
 
-        if (spec.equals(Specification.where(UserSpecifications.hasVetId(vetId)))) {
+        if (!lot) {
 
             return Page.empty(pageable);
 
