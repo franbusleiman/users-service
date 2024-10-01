@@ -120,20 +120,20 @@ public class UserServiceImpl implements UserService {
                     for (int i = 1; i < partes.length; i++) {
 
                         String nombre = String.join(" ", Arrays.copyOfRange(partes, 0, partes.length - 1));
-                    String apellido = partes[partes.length - 1];
-                    spec = spec.or(UserSpecifications.containsName(nombre)
-                            .and(UserSpecifications.containsSurname(apellido))
-                            .and(UserSpecifications.hasVetId(vetId)));
-                    ;}
+                        String apellido = partes[partes.length - 1];
+                        spec = spec.or(UserSpecifications.containsName(nombre)
+                                .and(UserSpecifications.containsSurname(apellido))
+                                .and(UserSpecifications.hasVetId(vetId)));
+                        ;
+                    }
                 } else {
                     System.out.println("Ingreso partes 3: " + param);
 
-                    if(param.contains("@")){
+                    if (param.contains("@")) {
                         System.out.println("Ingreso partes 4: " + param);
 
                         spec = spec.or(UserSpecifications.containsEmail(param));
-                    }
-                    else{
+                    } else {
                         System.out.println("Ingreso partes 5: " + param);
 
                         spec = spec.or(UserSpecifications.containsName(param))
@@ -143,17 +143,19 @@ public class UserServiceImpl implements UserService {
                     }
                 }
             }
-            return userRepository.findAll(spec, pageable)
-                    .map(user ->{
-                        UserAnimalsResponse userAnimalsResponse = userMapper.userToUserAnimalsResponse(user);
-                        userAnimalsResponse.setAnimals(animalsClient.getUserAnimals(user.getId()).getBody());
-                        return userAnimalsResponse;
-                    });
+
         }
-
         System.out.println("Salio con specs: " + spec);
-        return null;
 
+        if (spec.equals(Specification.where(UserSpecifications.hasVetId(vetId)))) {
+            return Page.empty(pageable);
+        }
+        return userRepository.findAll(spec, pageable)
+                .map(user -> {
+                    UserAnimalsResponse userAnimalsResponse = userMapper.userToUserAnimalsResponse(user);
+                    userAnimalsResponse.setAnimals(animalsClient.getUserAnimals(user.getId()).getBody());
+                    return userAnimalsResponse;
+                });
     }
 
     @Override
