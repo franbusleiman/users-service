@@ -148,14 +148,18 @@ public class UserServiceImpl implements UserService {
         System.out.println("Salio con specs: " + spec);
 
         if (spec.equals(Specification.where(UserSpecifications.hasVetId(vetId)))) {
+
             return Page.empty(pageable);
-        }
-        return userRepository.findAll(spec, pageable)
+
+        }else {
+            return userRepository.findAll(spec, pageable)
                 .map(user -> {
                     UserAnimalsResponse userAnimalsResponse = userMapper.userToUserAnimalsResponse(user);
                     userAnimalsResponse.setAnimals(animalsClient.getUserAnimals(user.getId()).getBody());
                     return userAnimalsResponse;
                 });
+        }
+
     }
 
     @Override
