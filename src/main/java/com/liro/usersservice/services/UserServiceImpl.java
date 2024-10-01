@@ -143,16 +143,17 @@ public class UserServiceImpl implements UserService {
                     }
                 }
             }
+            return userRepository.findAll(spec, pageable)
+                    .map(user ->{
+                        UserAnimalsResponse userAnimalsResponse = userMapper.userToUserAnimalsResponse(user);
+                        userAnimalsResponse.setAnimals(animalsClient.getUserAnimals(user.getId()).getBody());
+                        return userAnimalsResponse;
+                    });
         }
 
         System.out.println("Salio con specs: " + spec);
+        return null;
 
-        return userRepository.findAll(spec, pageable)
-                .map(user ->{
-                   UserAnimalsResponse userAnimalsResponse = userMapper.userToUserAnimalsResponse(user);
-                   userAnimalsResponse.setAnimals(animalsClient.getUserAnimals(user.getId()).getBody());
-                   return userAnimalsResponse;
-                });
     }
 
     @Override
