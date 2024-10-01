@@ -98,7 +98,6 @@ public class UserServiceImpl implements UserService {
         Long vetId = userDTO.getId();
 
         Specification<User> spec = Specification.where(null);
-        spec = spec.and(UserSpecifications.isEnabled(true));
         spec = spec.and(UserSpecifications.hasVetId(vetId));
 
         if (StringUtils.hasText(param)) {
