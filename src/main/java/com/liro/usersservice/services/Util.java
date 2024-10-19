@@ -17,7 +17,7 @@ public class Util {
             setterMethod.accept(value);
         }
     }
-    public static JwtUserDTO getUser(String token){
+    public static JwtUserDTO getUser(String token, Long clinicId){
         Claims claims;
 
         claims = Jwts.parser()
@@ -30,6 +30,7 @@ public class Util {
                 .email((String) claims.get("email"))
                 .id(Long.valueOf((Integer) claims.get("id")))
                 .roles((List<String>) claims.get("authorities"))
+                .clinicId(clinicId)
                 .build();
     }
 

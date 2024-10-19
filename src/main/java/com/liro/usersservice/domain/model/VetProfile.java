@@ -27,7 +27,4 @@ public class VetProfile  {
             optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vetProfile")
-    private Set<VetClient> vetClients;
 }

@@ -61,7 +61,7 @@ public class UserController {
 
         logger.info("Getting user by username");
 
-        return ResponseEntity.ok(userService.findById(getUser(token).getId()));
+        return ResponseEntity.ok(userService.findById(getUser(token, null).getId()));
     }
 
     @GetMapping(value = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -102,8 +102,9 @@ public class UserController {
 
     @PostMapping(value = "/client", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> createUserByVet(@RequestBody @Valid ClientRegister clientRegister,
+                                                        @RequestHeader(name = "clinicId", required = false) Long clinicId,
                                                         @RequestHeader(name = "Authorization", required = false) String token) {
-        UserResponse userResponse = userService.createUserByVet(clientRegister, token);
+        UserResponse userResponse = userService.createUserByVet(clientRegister, getUser(token, clinicId));
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -116,9 +117,9 @@ public class UserController {
 
     @PostMapping(value = "/clients", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserResponse>> createUserByVetMigrator(@RequestBody @Valid List<ClientRegister> clientRegisters,
-                                                                      @RequestParam("vetUserId") Long vetUserId) {
+                                                                      @RequestParam("vetClinicId") Long vetClinicId) {
 
-        return ResponseEntity.ok().body(userService.createUsersByVetMigrator(clientRegisters, vetUserId));
+        return ResponseEntity.ok().body(userService.createUsersByVetMigrator(clientRegisters, vetClinicId));
     }
 
 
@@ -141,10 +142,11 @@ public class UserController {
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Page<UserAnimalsResponse>> getUserBySearchCriteria(Pageable pageable,
                                                                              @RequestParam("param") String param,
+                                                                             @RequestHeader(name = "clinicId", required = false) Long clinicId,
                                                                              @RequestHeader(name = "Authorization", required = false) String token) {
 
 
-        return ResponseEntity.ok(userService.findAll(pageable, param, getUser(token)));
+        return ResponseEntity.ok(userService.findAll(pageable, param, getUser(token, clinicId)));
     }
 
     @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE, ElementType.TYPE})

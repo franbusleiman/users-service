@@ -1,13 +1,12 @@
 package com.liro.usersservice.persistance;
 
 import com.liro.usersservice.domain.model.User;
-import com.liro.usersservice.domain.model.VetClient;
 import com.liro.usersservice.domain.model.VetProfile;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
+import java.util.List;
 
 public class UserSpecifications {
 
@@ -27,12 +26,8 @@ public class UserSpecifications {
         return (root, query, cb) -> cb.like(cb.lower(root.get("email")),"%" + email.toLowerCase()+ "%");
     }
 
-    public static Specification<User> hasVetId(Long vetId) {
-        return (root, query, cb) -> {
-            Join<User, VetClient> vetClientJoin = root.join("vetClients", JoinType.INNER);
-            Join<VetClient, VetProfile> vetProfileJoin = vetClientJoin.join("vetProfile", JoinType.INNER);
-            return cb.equal(vetProfileJoin.get("user").get("id"), vetId);
-        };
+    public static Specification<User> hasIdIn(List<Long> ids) {
+        return (root, query, criteriaBuilder) -> root.get("id").in(ids);
     }
 
     public static Specification<User> isEnabled(Boolean enabled){

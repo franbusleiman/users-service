@@ -25,9 +25,9 @@ public interface UserService {
 
     UserResponse createUser(UserRegister user);
 
-    UserResponse createUserByVet(ClientRegister user, String token);
+    UserResponse createUserByVet(ClientRegister user, JwtUserDTO userDTO);
 
-    List<UserResponse> createUsersByVetMigrator(List<ClientRegister> user, Long vetUserId);
+    List<UserResponse> createUsersByVetMigrator(List<ClientRegister> user, Long vetClinicId);
 
 
     UserResponse changeUserState(User user, Long id);
