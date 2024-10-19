@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 import static com.liro.usersservice.services.Util.getUser;
@@ -163,6 +164,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserResponse(userRepository.save(user));
     }
 
+    @Transactional
     @Override
     public UserResponse createUserByVet(ClientRegister userRegister, JwtUserDTO userDTO) {
 
