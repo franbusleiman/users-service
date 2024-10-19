@@ -115,8 +115,9 @@ public class UserServiceImpl implements UserService {
                 Long dni = Long.parseLong(param);
                 spec = spec.and(UserSpecifications.hasDni(dni));
             } catch (NumberFormatException e) {
+
                 String[] partes = param.split(" ");
-                if (partes.length < 1) {
+                if (partes.length <= 1) {
                     if (param.contains("@")) {
                         spec = spec.or(UserSpecifications.containsEmail(param));
                     } else {
@@ -126,7 +127,8 @@ public class UserServiceImpl implements UserService {
                         spec = spec.or(UserSpecifications.containsSurname(param))
                                 .and(UserSpecifications.hasIdIn(clinicUserIds));
                     }
-                } else {
+                }
+                else {
                     clinicUserIds = clinicsClient.getUsersByClinicId(clinicId).getBody();
                     for (int i = 1; i < partes.length; i++) {
                         String nombre = String.join(" ", Arrays.copyOfRange(partes, 0, partes.length - 1));
@@ -138,6 +140,7 @@ public class UserServiceImpl implements UserService {
                 }
             }
         }
+
 
         // Devolver los resultados paginados
         return userRepository.findAll(spec, pageable)
