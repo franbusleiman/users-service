@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 
-@FeignClient(name = "clinic-service")
+@FeignClient(name = "clinics-service")
 public interface FeignClinicClientClient {
 
     @RequestMapping(method = RequestMethod.POST, value = "/clinicClients/{clinicId}")
