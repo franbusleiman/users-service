@@ -169,12 +169,14 @@ public class UserServiceImpl implements UserService {
         VetProfile vetProfile = vetProfileRepository.findByUserId(userDTO.getId())
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
 
+        System.out.println(userDTO);
         if (!userDTO.getRoles().contains("ROLE_VET")) {
 
             throw new UnauthorizedException("The user is not authorized!");
 
         }
 
+        System.out.println("paso");
         User user = userMapper.clientRegisterToUser(userRegister);
         Optional<Role> role = roleRepository.findByName("ROLE_USER");
         role.ifPresent(value -> user.getRoles().add(value));
