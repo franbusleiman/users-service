@@ -6,6 +6,7 @@ import com.liro.usersservice.domain.model.Role;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -32,6 +33,8 @@ public class User implements Serializable {
     private String identificationNr;
     private LocalDate birthDate;
     private Gender gender;
+    @Column(unique = true)
+    @Email
     private String email;
     private String name;
     private String surname;
