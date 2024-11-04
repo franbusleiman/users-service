@@ -10,6 +10,7 @@ import com.liro.usersservice.mappers.AddressMapper;
 import com.liro.usersservice.mappers.UserMapper;
 import com.liro.usersservice.persistance.*;
 import org.apache.commons.lang.StringUtils;
+import org.graalvm.shadowed.org.jcodings.util.Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -235,8 +236,6 @@ public class UserServiceImpl implements UserService {
             user.setCodigoVetter(vetClinicId + "-" + clientRegister.getCodigo());
 
 
-
-
             userRepository.save(user);
 
             ClinicClientDTO clinicClient = ClinicClientDTO.builder()
@@ -250,7 +249,45 @@ public class UserServiceImpl implements UserService {
             response.add(userMapper.userToUserResponse(user));
         });
 
-        response.forEach(response1 -> System.out.println(response1));
+        return response;
+    }
+
+    @Override
+    public HashMap<String, UserResponse> createUsersByCpVetMigrator(HashMap<String, ClientRegister> users, Long vetClinicId) {
+        HashMap<String, UserResponse> response = new HashMap<>();
+
+        users.values().forEach(clientRegister -> {
+
+            User user = userMapper.clientRegisterToUser(clientRegister);
+            Optional<Role> role = roleRepository.findByName("ROLE_USER");
+            role.ifPresent(value -> user.getRoles().add(value));
+
+            user.setEnabled(false);
+
+            if (user.getAddresses() == null) {
+                user.setAddresses(new HashSet<>());
+            }
+
+            Address address = addressMapper.addressDtoToAddress(clientRegister.getAddress());
+
+            address.setUser(user);
+            user.getAddresses().add(address);
+
+            user.setCodigoVetter(vetClinicId + "-" + clientRegister.getCodigo());
+
+            userRepository.save(user);
+
+            ClinicClientDTO clinicClient = ClinicClientDTO.builder()
+                    .clinicId(vetClinicId)
+                    .userId(user.getId())
+                    .accountBalance(0.0)
+                    .build();
+
+            clinicsClient.addClinicClient(clinicClient);
+
+            response.put(user.getPhoneNumber(), userMapper.userToUserResponse(user));
+        });
+
         return response;
     }
 

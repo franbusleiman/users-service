@@ -2,9 +2,11 @@ package com.liro.usersservice.services;
 
 import com.liro.usersservice.domain.dtos.users.*;
 import com.liro.usersservice.domain.model.User;
+import org.graalvm.shadowed.org.jcodings.util.Hash;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface UserService {
@@ -28,6 +30,7 @@ public interface UserService {
     UserResponse createUserByVet(ClientRegister user, JwtUserDTO userDTO);
 
     List<UserResponse> createUsersByVetMigrator(List<ClientRegister> user, Long vetClinicId);
+    HashMap<String, UserResponse> createUsersByCpVetMigrator(HashMap<String, ClientRegister> user, Long vetClinicId);
 
 
     UserResponse changeUserState(User user, Long id);

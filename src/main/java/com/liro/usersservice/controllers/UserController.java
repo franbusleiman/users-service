@@ -21,6 +21,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import static com.liro.usersservice.services.Util.getUser;
@@ -122,6 +124,12 @@ public class UserController {
         return ResponseEntity.ok().body(userService.createUsersByVetMigrator(clientRegisters, vetClinicId));
     }
 
+    @PostMapping(value = "/clients/cpvet", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HashMap<String, UserResponse>> createUserByCPVetMigrator(@RequestBody @Valid HashMap<String, ClientRegister> clientRegisters,
+                                                                           @RequestParam("vetClinicId") Long vetClinicId) {
+
+        return ResponseEntity.ok().body(userService.createUsersByCpVetMigrator(clientRegisters, vetClinicId));
+    }
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> changeState(@RequestBody User user,
