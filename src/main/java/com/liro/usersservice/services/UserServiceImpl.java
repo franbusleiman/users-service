@@ -192,10 +192,13 @@ public class UserServiceImpl implements UserService {
             user.setAddresses(new HashSet<>());
         }
 
-        Address address = addressMapper.addressDtoToAddress(userRegister.getAddress());
+        if(userRegister.getAddress()!=null && userRegister.getAddress().getAddressLine1()!=null){
+            Address address = addressMapper.addressDtoToAddress(userRegister.getAddress());
 
-        address.setUser(user);
-        user.getAddresses().add(address);
+            address.setUser(user);
+            user.getAddresses().add(address);
+
+        }
 
         userRepository.save(user);
 
@@ -227,10 +230,14 @@ public class UserServiceImpl implements UserService {
                 user.setAddresses(new HashSet<>());
             }
 
-            Address address = addressMapper.addressDtoToAddress(clientRegister.getAddress());
 
-            address.setUser(user);
-            user.getAddresses().add(address);
+            if(clientRegister.getAddress()!=null && clientRegister.getAddress().getAddressLine1()!=null) {
+
+                Address address = addressMapper.addressDtoToAddress(clientRegister.getAddress());
+
+                address.setUser(user);
+                user.getAddresses().add(address);
+            }
 
             user.setCodigoVetter(vetClinicId + "-" + clientRegister.getCodigo());
 
