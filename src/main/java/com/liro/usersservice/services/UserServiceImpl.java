@@ -10,7 +10,6 @@ import com.liro.usersservice.mappers.AddressMapper;
 import com.liro.usersservice.mappers.UserMapper;
 import com.liro.usersservice.persistance.*;
 import org.apache.commons.lang.StringUtils;
-import org.graalvm.shadowed.org.jcodings.util.Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
