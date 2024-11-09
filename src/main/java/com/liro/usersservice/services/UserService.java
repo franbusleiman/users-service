@@ -14,6 +14,9 @@ public interface UserService {
 
     UserResponse findByIdentificationNr(String id);
 
+    UserResponse setAccount(SetAccountDTO setAccountDTO);
+
+
 
     UserCompleteResponse findByUsername(String username);
 

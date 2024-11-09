@@ -58,9 +58,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse findByIdentificationNr(String id) {
-        System.out.println("buscando by identification nr: " + id);
         return userMapper.userToUserResponse(userRepository.findUserByIdentificationNr(id)
                 .orElseThrow(() -> new RuntimeException("Resource not found")));
+    }
+
+    @Override
+    public UserResponse setAccount(SetAccountDTO setAccountDTO) {
+
+        User user = userRepository.findUserByEmail(setAccountDTO.getEmail())
+                .orElseThrow(() -> new RuntimeException("Resource not found"));
+
+        if(user.getPassword()==null){
+            user.setPassword(passwordEncoder.encode(setAccountDTO.getPassword()));
+        }
+
+        return userMapper.userToUserResponse(userRepository.save(user));
     }
 
 
@@ -186,7 +198,7 @@ public class UserServiceImpl implements UserService {
         Optional<Role> role = roleRepository.findByName("ROLE_USER");
         role.ifPresent(value -> user.getRoles().add(value));
 
-        user.setEnabled(false);
+        user.setEnabled(true);
 
         if (user.getAddresses() == null) {
             user.setAddresses(new HashSet<>());
@@ -224,7 +236,7 @@ public class UserServiceImpl implements UserService {
             Optional<Role> role = roleRepository.findByName("ROLE_USER");
             role.ifPresent(value -> user.getRoles().add(value));
 
-            user.setEnabled(false);
+            user.setEnabled(true);
 
             if (user.getAddresses() == null) {
                 user.setAddresses(new HashSet<>());
@@ -268,7 +280,7 @@ public class UserServiceImpl implements UserService {
             Optional<Role> role = roleRepository.findByName("ROLE_USER");
             role.ifPresent(value -> user.getRoles().add(value));
 
-            user.setEnabled(false);
+            user.setEnabled(true);
 
             if (user.getAddresses() == null) {
                 user.setAddresses(new HashSet<>());

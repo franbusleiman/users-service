@@ -49,6 +49,12 @@ public class UserController {
         return ResponseEntity.ok(userService.findByIdentificationNr(id));
     }
 
+    @PostMapping(value = "/setAccount", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserResponse> setAccount(@RequestBody SetAccountDTO setAccountDTO) throws InterruptedException {
+
+        return ResponseEntity.ok(userService.setAccount(setAccountDTO));
+    }
+
 
     @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserCompleteResponse> getUserByUsername(@PathVariable("username") String username) throws InterruptedException {

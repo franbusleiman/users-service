@@ -1,5 +1,6 @@
 package com.liro.usersservice.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,7 +29,8 @@ public class BCryptConfig {
 
     public String CLIENT_SECRET = "12345";
 
-    public String AUTH_SERVER = "https://api.liro.pet/api/security";
+    @Value(value = "${auth.server}")
+    public String AUTH_SERVER;
 
 
     @Bean
