@@ -37,7 +37,6 @@ public class UserController {
 
     Logger logger = LoggerFactory.getLogger(UserController.class);
 
-
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserCompleteResponse> getUserById(@PathVariable("id") Long id) throws InterruptedException {
 
