@@ -33,6 +33,7 @@ public class User implements Serializable {
     private String identificationNr;
     private LocalDate birthDate;
     private Gender gender;
+
     @Column(unique = true)
     @Email
     private String email;

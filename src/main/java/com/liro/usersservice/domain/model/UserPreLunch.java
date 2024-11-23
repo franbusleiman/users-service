@@ -19,6 +19,7 @@ import javax.validation.constraints.Null;
 @Setter
 @Table(name = "users_prelunch")
 public class UserPreLunch {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
