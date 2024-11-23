@@ -143,8 +143,9 @@ public class UserServiceImpl implements UserService {
                 else {
                     clinicUserIds = clinicsClient.getUsersByClinicId(clinicId).getBody();
                     for (int i = 1; i < partes.length; i++) {
-                        String nombre = String.join(" ", Arrays.copyOfRange(partes, 0, partes.length - 1));
-                        String apellido = partes[partes.length - 1];
+                        String nombre = String.join(" ", Arrays.copyOfRange(partes, 0, i));
+                        String apellido = String.join(" ", Arrays.copyOfRange(partes, i, partes.length));
+
                         spec = spec.or(UserSpecifications.containsName(nombre)
                                 .and(UserSpecifications.containsSurname(apellido))
                                 .and(UserSpecifications.hasIdIn(clinicUserIds)));
