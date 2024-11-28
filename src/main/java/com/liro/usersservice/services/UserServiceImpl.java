@@ -276,8 +276,9 @@ public class UserServiceImpl implements UserService {
     public HashMap<String, UserResponse> createUsersByCpVetMigrator(HashMap<String, ClientRegister> users, Long vetClinicId) {
         HashMap<String, UserResponse> response = new HashMap<>();
 
-        users.values().forEach(clientRegister -> {
+        users.keySet().forEach(client -> {
 
+            ClientRegister clientRegister = users.get(client);
             User user = userMapper.clientRegisterToUser(clientRegister);
             Optional<Role> role = roleRepository.findByName("ROLE_USER");
             role.ifPresent(value -> user.getRoles().add(value));
@@ -308,7 +309,7 @@ public class UserServiceImpl implements UserService {
 
             clinicsClient.addClinicClient(clinicClient);
 
-            response.put(user.getPhoneNumber(), userMapper.userToUserResponse(user));
+            response.put(client, userMapper.userToUserResponse(user));
         });
 
         return response;
