@@ -1,6 +1,7 @@
 package com.liro.usersservice.domain.dtos.users;
 
 
+import com.liro.usersservice.domain.dtos.address.AddressDTO;
 import com.liro.usersservice.domain.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,5 +29,5 @@ public class UserDTO {
     private LocalDate birthDate;
     private Integer intents;
     private Gender gender;
-
+    private Set<AddressDTO> addresses;
 }

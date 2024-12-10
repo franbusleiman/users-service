@@ -53,8 +53,8 @@ public class User implements Serializable {
             cascade = CascadeType.ALL,
             mappedBy = "user")
     private VetProfile vetProfile;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private Set<Address> addresses;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval=true)
+    private Set<Address> addresses = new HashSet<>();
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_roles",
             joinColumns = {@JoinColumn(name = "users_id")},

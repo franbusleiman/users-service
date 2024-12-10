@@ -144,6 +144,13 @@ public class UserController {
         return ResponseEntity.ok(userService.changeUserState(user, id));
     }
 
+    @PutMapping(value = "/client/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserResponse> updateClient(@RequestBody UserDTO user,
+                                                    @PathVariable("id") Long id) {
+
+        return ResponseEntity.ok(userService.updateUser(user, id));
+    }
+
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
 

@@ -4,6 +4,7 @@ import com.liro.usersservice.domain.dtos.users.*;
 import com.liro.usersservice.domain.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = AddressMapper.class)
@@ -24,6 +25,8 @@ public interface UserMapper {
 
     UserAnimalsResponse userToUserAnimalsResponse(User user);
 
-
     User clientRegisterToUser(ClientRegister clientRegister);
+
+    @Mapping(target = "addresses", ignore = true)
+    void updateUser(UserDTO userDTO, @MappingTarget User user);
 }

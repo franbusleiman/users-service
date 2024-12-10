@@ -1,5 +1,6 @@
 package com.liro.usersservice.domain.dtos.users;
 
+import com.liro.usersservice.domain.dtos.address.AddressDTO;
 import com.liro.usersservice.domain.enums.Gender;
 import com.liro.usersservice.domain.model.Role;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,4 +35,5 @@ public class UserCompleteResponse {
     private Integer intents;
     private Gender gender;
 
+    private Set<AddressDTO> addresses;
 }

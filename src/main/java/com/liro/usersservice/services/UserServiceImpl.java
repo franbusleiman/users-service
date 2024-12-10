@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.liro.usersservice.services.Util.getUser;
 
@@ -30,6 +31,9 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     @Autowired
     VetProfileRepository vetProfileRepository;
+
+    @Autowired
+    AddressRepository addressRepository;
 
     @Autowired
     RoleRepository roleRepository;
@@ -329,6 +333,31 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user1);
 
         return userMapper.userToUserResponse(user1);
+    }
+
+    @Override
+    public UserResponse updateUser(UserDTO userDTO, Long id) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Resource not found"));
+
+        userMapper.updateUser(userDTO, user);
+
+        // Clear the existing addresses without replacing the collection
+        user.getAddresses().clear();
+
+        if (userDTO.getAddresses() != null) {
+            Set<Address> addresses = userDTO.getAddresses().stream().map(addressDTO -> {
+                Address address = addressMapper.addressDtoToAddress(addressDTO);
+                address.setUser(user);
+                return address;
+            }).collect(Collectors.toSet());
+
+            user.getAddresses().addAll(addresses); // Add new addresses
+        }
+
+        // Save the user with updated addresses
+        return userMapper.userToUserResponse(userRepository.save(user));
     }
 
     @Override

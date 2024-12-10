@@ -37,5 +37,7 @@ public interface UserService {
 
     UserResponse changeUserState(User user, Long id);
 
+    UserResponse updateUser(UserDTO user, Long id);
+
     void deleteUser(Long id);
 }
