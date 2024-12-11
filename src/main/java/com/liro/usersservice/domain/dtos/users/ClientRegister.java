@@ -21,7 +21,6 @@ import java.time.LocalDate;
 @Setter
 public class ClientRegister {
 
-    @NotBlank(message = "username must not be null")
     private String username;
     @NotBlank(message = "name must not be null")
     private String name;
@@ -32,9 +31,7 @@ public class ClientRegister {
     private String email;
     private String phoneNumber;
     private String areaPhoneNumber;
-    @NotBlank(message = "identificationNr must not be null")
     private String identificationNr;
-    @NotNull(message = "birthDate must not be null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
     @NotNull(message = "gender must not be null")
