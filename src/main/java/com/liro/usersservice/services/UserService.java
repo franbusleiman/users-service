@@ -40,4 +40,7 @@ public interface UserService {
     UserResponse updateUser(UserDTO user, Long id);
 
     void deleteUser(Long id);
+
+    String sendInviteMail(String email, JwtUserDTO userDTO);
+
 }
