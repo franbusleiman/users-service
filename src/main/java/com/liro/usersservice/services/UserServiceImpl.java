@@ -9,15 +9,31 @@ import com.liro.usersservice.exceptions.UnauthorizedException;
 import com.liro.usersservice.mappers.AddressMapper;
 import com.liro.usersservice.mappers.UserMapper;
 import com.liro.usersservice.persistance.*;
+import lombok.var;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,6 +67,13 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
+
+
     UserMapper userMapper = UserMapper.userMapper;
 
 
@@ -72,7 +95,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findUserByEmail(setAccountDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
 
-        if(user.getPassword()==null){
+        if (user.getPassword() == null) {
             user.setPassword(passwordEncoder.encode(setAccountDTO.getPassword()));
         }
 
@@ -143,8 +166,7 @@ public class UserServiceImpl implements UserService {
                         spec = spec.or(UserSpecifications.containsSurname(param))
                                 .and(UserSpecifications.hasIdIn(clinicUserIds));
                     }
-                }
-                else {
+                } else {
                     clinicUserIds = clinicsClient.getUsersByClinicId(clinicId).getBody();
                     for (int i = 1; i < partes.length; i++) {
                         String apellido = String.join(" ", Arrays.copyOfRange(partes, 0, i));
@@ -210,7 +232,7 @@ public class UserServiceImpl implements UserService {
             user.setAddresses(new HashSet<>());
         }
 
-        if(userRegister.getAddress()!=null && userRegister.getAddress().getAddressLine1()!=null){
+        if (userRegister.getAddress() != null && userRegister.getAddress().getAddressLine1() != null) {
             Address address = addressMapper.addressDtoToAddress(userRegister.getAddress());
 
             address.setUser(user);
@@ -249,7 +271,7 @@ public class UserServiceImpl implements UserService {
             }
 
 
-            if(clientRegister.getAddress()!=null && clientRegister.getAddress().getAddressLine1()!=null) {
+            if (clientRegister.getAddress() != null && clientRegister.getAddress().getAddressLine1() != null) {
 
                 Address address = addressMapper.addressDtoToAddress(clientRegister.getAddress());
 
@@ -293,7 +315,7 @@ public class UserServiceImpl implements UserService {
                 user.setAddresses(new HashSet<>());
             }
 
-            if(clientRegister.getAddress()!=null && clientRegister.getAddress().getAddressLine1()!=null) {
+            if (clientRegister.getAddress() != null && clientRegister.getAddress().getAddressLine1() != null) {
 
                 Address address = addressMapper.addressDtoToAddress(clientRegister.getAddress());
 
@@ -369,4 +391,61 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
 
     }
+
+    @Override
+    public String sendInviteMail(String email, JwtUserDTO userDTO) {
+        VetProfile vetProfile = vetProfileRepository.findByUserId(userDTO.getId()).orElseThrow(()-> new RuntimeException("Resource not found"));
+
+        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new RuntimeException("Resource not found"));
+
+        if (!userDTO.getRoles().contains("ROLE_VET")){
+            throw new UnauthorizedException("The user is not authorized!");
+        }
+
+        try {
+            ClassPathResource resource = new ClassPathResource("templates/emailContent.html");
+            StringBuilder content = new StringBuilder();
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    content.append(line).append("\n");
+                }
+
+            }
+
+
+            String htmlContent = content.toString()
+                    .replace("$veterinarioname", vetProfile.getUser().getName())
+                    .replace("$username", user.getName())
+                    .replace("$user_emai", user.getEmail())
+                    .replace("$randomDato", "Liro2024");
+
+
+
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+
+            helper.setFrom("quinterosjuanmanuel1@gmail.com");
+            helper.setTo(user.getEmail());
+            helper.setSubject("¡INVITACIÓN A LIRO!");
+            helper.setText(htmlContent, true);
+
+            helper.addInline("headerImage", new ClassPathResource("images/header-02.webp"));
+            helper.addInline("downloadButton", new ClassPathResource("images/descargar_btn.webp"));
+            helper.addInline("miniLogo", new ClassPathResource("images/mini_loog.webp"));
+
+            mailSender.send(message);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "EXITO";
+    }
 }
+
+
+
+

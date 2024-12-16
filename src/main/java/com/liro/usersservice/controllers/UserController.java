@@ -179,4 +179,14 @@ public class UserController {
                     + "Default sort order is ascending. " + "Multiple sort criteria are supported.")})
     @interface ApiPageable {
     }
+
+    @GetMapping(value = "/send-mail",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> sendInviteMail(@RequestParam("email")String email,
+                                               @RequestHeader(name = "clinicId", required = false) Long clinicId,
+                                               @RequestHeader(name = "Authorization", required = false) String token){
+
+        userService.sendInviteMail(email, getUser(token, clinicId));
+
+        return ResponseEntity.ok().build();
+    }
 }
