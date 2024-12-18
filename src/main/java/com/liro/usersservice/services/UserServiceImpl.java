@@ -3,6 +3,7 @@ package com.liro.usersservice.services;
 import brave.Tracer;
 import com.liro.usersservice.configuration.FeignAnimalsClient;
 import com.liro.usersservice.configuration.FeignClinicClientClient;
+import com.liro.usersservice.domain.dtos.animals.AnimalCompleteResponse;
 import com.liro.usersservice.domain.dtos.users.*;
 import com.liro.usersservice.domain.model.*;
 import com.liro.usersservice.exceptions.UnauthorizedException;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -382,13 +384,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String sendInviteMail(String email, JwtUserDTO userDTO) {
-        VetProfile vetProfile = vetProfileRepository.findByUserId(userDTO.getId()).orElseThrow(()-> new RuntimeException("Resource not found"));
-
-        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new RuntimeException("Resource not found"));
 
         if (!userDTO.getRoles().contains("ROLE_VET")){
             throw new UnauthorizedException("The user is not authorized!");
         }
+
+        VetProfile vetProfile = vetProfileRepository.findByUserId(userDTO.getId()).orElseThrow(()-> new RuntimeException("Resource not found"));
+        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new RuntimeException("Resource not found"));
+
+        ResponseEntity<List<AnimalCompleteResponse>> animals = animalsClient.getUserAnimals(user.getId());
+        String name = "";
+
+        if (animals.hasBody() && !animals.getBody().isEmpty()){
+             name = animals.getBody().get(0).getName();
+        }
+
 
         try {
             ClassPathResource resource = new ClassPathResource("templates/emailContent.html");
@@ -405,9 +415,10 @@ public class UserServiceImpl implements UserService {
 
             String htmlContent = content.toString()
                     .replace("$veterinarioname", vetProfile.getUser().getName())
+                    .replace("$petname1", name)
                     .replace("$username", user.getName())
-                    .replace("$user_emai", user.getEmail())
-                    .replace("$randomDato", "Liro2024");
+                    .replace("$user_email", user.getEmail())
+                    .replace("$random", "Liro2024");
 
 
 
@@ -421,9 +432,9 @@ public class UserServiceImpl implements UserService {
             helper.setSubject("¡INVITACIÓN A LIRO!");
             helper.setText(htmlContent, true);
 
-            helper.addInline("headerImage", new ClassPathResource("images/header-02.webp"));
-            helper.addInline("downloadButton", new ClassPathResource("images/descargar_btn.webp"));
-            helper.addInline("miniLogo", new ClassPathResource("images/mini_loog.webp"));
+//            helper.addInline("headerImage", new ClassPathResource("images/header-02.webp"));
+//            helper.addInline("downloadButton", new ClassPathResource("images/descargar_btn.webp"));
+//            helper.addInline("miniLogo", new ClassPathResource("images/mini_loog.webp"));
 
             mailSender.send(message);
 
