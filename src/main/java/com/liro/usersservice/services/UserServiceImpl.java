@@ -394,11 +394,19 @@ public class UserServiceImpl implements UserService {
 
         ResponseEntity<List<AnimalCompleteResponse>> animals = animalsClient.getUserAnimals(user.getId());
         String name = "";
+        String numberPet="tu mascota";
 
-        if (animals.hasBody() && !animals.getBody().isEmpty()){
-             name = animals.getBody().get(0).getName();
+
+        if (animals!= null && animals.hasBody() && !Objects.requireNonNull(animals.getBody()).isEmpty()) {
+            name = animals.getBody().get(0).getName();
+
+            if (animals.getBody().size() > 1) {
+                numberPet = "tus mascotas";
+                for(int i = 0; i < animals.getBody().size(); i++){
+
+                }
+            }
         }
-
 
         try {
             ClassPathResource resource = new ClassPathResource("templates/emailContent.html");
@@ -415,10 +423,11 @@ public class UserServiceImpl implements UserService {
 
             String htmlContent = content.toString()
                     .replace("$veterinarioname", vetProfile.getUser().getName())
-                    .replace("$petname1", name)
                     .replace("$username", user.getName())
                     .replace("$user_email", user.getEmail())
-                    .replace("$random", "Liro2024");
+                    .replace("$random", "Liro2024")
+                    .replace("$numberpets", numberPet)
+                    .replace("$petname", "");
 
 
 
@@ -432,9 +441,6 @@ public class UserServiceImpl implements UserService {
             helper.setSubject("¡INVITACIÓN A LIRO!");
             helper.setText(htmlContent, true);
 
-//            helper.addInline("headerImage", new ClassPathResource("images/header-02.webp"));
-//            helper.addInline("downloadButton", new ClassPathResource("images/descargar_btn.webp"));
-//            helper.addInline("miniLogo", new ClassPathResource("images/mini_loog.webp"));
 
             mailSender.send(message);
 
