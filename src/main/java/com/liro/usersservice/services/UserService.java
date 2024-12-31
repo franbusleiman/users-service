@@ -5,6 +5,8 @@ import com.liro.usersservice.domain.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,5 +41,10 @@ public interface UserService {
 
     UserResponse updateUser(UserDTO user, Long id);
 
+
+    void sendInviteMail(String email, JwtUserDTO userDTO, Long userId) throws MessagingException, IOException;
+
+    void acceptInvite(String email, String password);
+    Boolean existInvite(String email);
     void deleteUser(Long id);
 }

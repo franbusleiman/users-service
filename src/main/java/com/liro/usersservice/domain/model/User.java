@@ -2,6 +2,7 @@ package com.liro.usersservice.domain.model;
 
 
 import com.liro.usersservice.domain.enums.Gender;
+import com.liro.usersservice.domain.enums.State;
 import com.liro.usersservice.domain.model.Role;
 import lombok.*;
 
@@ -33,6 +34,7 @@ public class User implements Serializable {
     private String identificationNr;
     private LocalDate birthDate;
     private Gender gender;
+    private State state;
 
     @Column(unique = true)
     @Email

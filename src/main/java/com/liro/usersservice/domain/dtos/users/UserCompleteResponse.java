@@ -2,6 +2,7 @@ package com.liro.usersservice.domain.dtos.users;
 
 import com.liro.usersservice.domain.dtos.address.AddressDTO;
 import com.liro.usersservice.domain.enums.Gender;
+import com.liro.usersservice.domain.enums.State;
 import com.liro.usersservice.domain.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,7 @@ import java.util.Set;
 public class UserCompleteResponse {
 
     private Long id;
+    private State state;
     private List<Role> roles;
     private String username;
     private String name;

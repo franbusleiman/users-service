@@ -26,9 +26,6 @@ public class ClientRegister {
     private String name;
     @NotBlank(message = "surname must not be null")
     private String surname;
-    @NotBlank(message = "email must not be null")
-    @Email(message = "Must be a valid email")
-    private String email;
     private String phoneNumber;
     private String areaPhoneNumber;
     private String identificationNr;

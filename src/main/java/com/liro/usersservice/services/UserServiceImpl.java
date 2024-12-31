@@ -3,8 +3,11 @@ package com.liro.usersservice.services;
 import brave.Tracer;
 import com.liro.usersservice.configuration.FeignAnimalsClient;
 import com.liro.usersservice.configuration.FeignClinicClientClient;
+import com.liro.usersservice.configuration.PasswordGenerator;
 import com.liro.usersservice.domain.dtos.users.*;
+import com.liro.usersservice.domain.enums.State;
 import com.liro.usersservice.domain.model.*;
+import com.liro.usersservice.exceptions.NotFoundException;
 import com.liro.usersservice.exceptions.UnauthorizedException;
 import com.liro.usersservice.mappers.AddressMapper;
 import com.liro.usersservice.mappers.UserMapper;
@@ -16,12 +19,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.core.io.ClassPathResource;
 
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.liro.usersservice.services.Util.getUser;
 
 
 @Service
@@ -35,6 +46,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     AddressRepository addressRepository;
 
+    @Autowired
+    private JavaMailSender mailSender;
     @Autowired
     RoleRepository roleRepository;
     @Autowired
@@ -50,6 +63,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserInviteRepository userInviteRepository;
 
     UserMapper userMapper = UserMapper.userMapper;
 
@@ -72,7 +88,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findUserByEmail(setAccountDTO.getEmail())
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
 
-        if(user.getPassword()==null){
+        if (user.getPassword() == null) {
             user.setPassword(passwordEncoder.encode(setAccountDTO.getPassword()));
         }
 
@@ -143,8 +159,7 @@ public class UserServiceImpl implements UserService {
                         spec = spec.or(UserSpecifications.containsSurname(param))
                                 .and(UserSpecifications.hasIdIn(clinicUserIds));
                     }
-                }
-                else {
+                } else {
                     clinicUserIds = clinicsClient.getUsersByClinicId(clinicId).getBody();
                     for (int i = 1; i < partes.length; i++) {
                         String apellido = String.join(" ", Arrays.copyOfRange(partes, 0, i));
@@ -192,25 +207,24 @@ public class UserServiceImpl implements UserService {
         VetProfile vetProfile = vetProfileRepository.findByUserId(userDTO.getId())
                 .orElseThrow(() -> new RuntimeException("Resource not found"));
 
-        System.out.println(userDTO);
         if (!userDTO.getRoles().contains("ROLE_VET")) {
 
             throw new UnauthorizedException("The user is not authorized!");
 
         }
 
-        System.out.println("paso");
         User user = userMapper.clientRegisterToUser(userRegister);
         Optional<Role> role = roleRepository.findByName("ROLE_USER");
         role.ifPresent(value -> user.getRoles().add(value));
 
         user.setEnabled(true);
+        user.setState(State.LOCAL);
 
         if (user.getAddresses() == null) {
             user.setAddresses(new HashSet<>());
         }
 
-        if(userRegister.getAddress()!=null && userRegister.getAddress().getAddressLine1()!=null){
+        if (userRegister.getAddress() != null && userRegister.getAddress().getAddressLine1() != null) {
             Address address = addressMapper.addressDtoToAddress(userRegister.getAddress());
 
             address.setUser(user);
@@ -243,13 +257,13 @@ public class UserServiceImpl implements UserService {
             role.ifPresent(value -> user.getRoles().add(value));
 
             user.setEnabled(true);
+            user.setState(State.LOCAL);
 
             if (user.getAddresses() == null) {
                 user.setAddresses(new HashSet<>());
             }
 
-
-            if(clientRegister.getAddress()!=null && clientRegister.getAddress().getAddressLine1()!=null) {
+            if (clientRegister.getAddress() != null && clientRegister.getAddress().getAddressLine1() != null) {
 
                 Address address = addressMapper.addressDtoToAddress(clientRegister.getAddress());
 
@@ -288,12 +302,13 @@ public class UserServiceImpl implements UserService {
             role.ifPresent(value -> user.getRoles().add(value));
 
             user.setEnabled(true);
+            user.setState(State.LOCAL);
 
             if (user.getAddresses() == null) {
                 user.setAddresses(new HashSet<>());
             }
 
-            if(clientRegister.getAddress()!=null && clientRegister.getAddress().getAddressLine1()!=null) {
+            if (clientRegister.getAddress() != null && clientRegister.getAddress().getAddressLine1() != null) {
 
                 Address address = addressMapper.addressDtoToAddress(clientRegister.getAddress());
 
@@ -360,6 +375,79 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserResponse(userRepository.save(user));
     }
 
+    @Transactional
+    @Override
+    public void sendInviteMail(String email, JwtUserDTO userDTO, Long userId) throws MessagingException, IOException {
+
+
+        //Validaciones de que es vet y se podrían sacar
+        VetProfile vetProfile = vetProfileRepository.findByUserId(userDTO.getId()).orElseThrow(() -> new RuntimeException("Resource not found"));
+
+        if (!userDTO.getRoles().contains("ROLE_VET")) {
+            throw new UnauthorizedException("The user is not authorized!");
+        }
+
+        //Validar que el mail   no se esta usando
+        if (userRepository.findUserByEmail(email).isPresent() || userInviteRepository.findByEmail(email).isPresent()) {
+            throw new RuntimeException("Email already in use");
+        }
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Resource not found"));
+
+        if (user.getState() == State.ACCEPTED) {
+            throw new RuntimeException("User already active!");
+        }
+
+        String generatedPassword = PasswordGenerator.generatePassword();
+        String passwordEncoded = passwordEncoder.encode(generatedPassword);
+
+        //Modificar invite o crear nuevo, dependiendo si el user tiene un invite activo
+        UserInvite userInvite = userInviteRepository.findByUserId(userId)
+                .map(userInvite1 -> {
+                    userInvite1.setCreatedAt(LocalDateTime.now());
+                    userInvite1.setEmail(email);
+                    userInvite1.setPassword(passwordEncoded);
+                    return userInvite1;
+                })
+                .orElse(UserInvite.builder().createdAt(LocalDateTime.now())
+                        .user(user)
+                        .email(email)
+                        .password(passwordEncoded)
+                        .build());
+
+        //Guardar user e invite
+        user.setState(State.PENDING);
+
+        userRepository.save(user);
+        userInviteRepository.save(userInvite);
+
+        sendEmail(vetProfile, user, email, generatedPassword);
+    }
+
+    @Transactional
+    @Override
+    public void acceptInvite(String email, String password) {
+        UserInvite userInvite = userInviteRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("Su invitacion no existe o ha expirado"));
+
+        if (!passwordEncoder.matches(password, userInvite.getPassword())) {
+            throw new RuntimeException("password incorrecta");
+        }
+
+        User user = userInvite.getUser();
+
+        user.setEmail(userInvite.getEmail());
+        user.setPassword(passwordEncoder.encode(password));
+        user.setState(State.ACCEPTED);
+
+        userRepository.save(user);
+        userInviteRepository.delete(userInvite);
+    }
+
+    @Override
+    public Boolean existInvite(String email) {
+        return userInviteRepository.existsByEmail(email);
+    }
+
     @Override
     public void deleteUser(Long id) {
 
@@ -368,5 +456,46 @@ public class UserServiceImpl implements UserService {
 
         userRepository.delete(user);
 
+    }
+
+    private void sendEmail(VetProfile vetProfile, User user, String email, String generatedPassword) throws IOException, MessagingException {
+        String name = "";
+
+        ClassPathResource resource = new ClassPathResource("templates/emailContent.html");
+        StringBuilder content = new StringBuilder();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+
+        }
+
+
+        String htmlContent = content.toString()
+                .replace("$veterinarioname", vetProfile.getUser().getName())
+                .replace("$petname1", name)
+                .replace("$username", user.getName())
+                .replace("$user_email", email)
+                .replace("$random", generatedPassword);
+
+
+
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+
+        helper.setFrom("quinterosjuanmanuel1@gmail.com");
+        helper.setTo(email);
+        helper.setSubject("¡INVITACIÓN A LIRO!");
+        helper.setText(htmlContent, true);
+
+//            helper.addInline("headerImage", new ClassPathResource("images/header-02.webp"));
+//            helper.addInline("downloadButton", new ClassPathResource("images/descargar_btn.webp"));
+//            helper.addInline("miniLogo", new ClassPathResource("images/mini_loog.webp"));
+
+        mailSender.send(message);
     }
 }

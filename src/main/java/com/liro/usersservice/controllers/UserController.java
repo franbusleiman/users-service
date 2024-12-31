@@ -3,6 +3,7 @@ package com.liro.usersservice.controllers;
 import com.liro.usersservice.domain.dtos.users.*;
 import com.liro.usersservice.domain.model.User;
 import com.liro.usersservice.services.UserService;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import org.slf4j.Logger;
@@ -15,7 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -49,12 +52,13 @@ public class UserController {
         return ResponseEntity.ok(userService.findByIdentificationNr(id));
     }
 
+    /*
     @PostMapping(value = "/setAccount", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> setAccount(@RequestBody SetAccountDTO setAccountDTO) throws InterruptedException {
 
         return ResponseEntity.ok(userService.setAccount(setAccountDTO));
     }
-
+*/
 
     @GetMapping(value = "/username/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserCompleteResponse> getUserByUsername(@PathVariable("username") String username) throws InterruptedException {
@@ -107,6 +111,32 @@ public class UserController {
 
         return ResponseEntity.created(location).body(user1);
     }
+
+    @PostMapping(value = "/send-invite",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> sendInviteMail(@RequestParam("email")String email,
+                                               @RequestParam("userId")Long  userId,
+                                               @RequestHeader(name = "clinicId", required = false) Long clinicId,
+                                               @RequestHeader(name = "Authorization", required = false) String token) throws MessagingException, IOException {
+
+        userService.sendInviteMail(email, getUser(token, clinicId), userId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/invite",produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> inviteExists(@RequestParam("email") String email)  {
+
+        return ResponseEntity.ok().body(userService.existInvite(email));
+    }
+
+
+    @PostMapping("/accept-invite")
+    public ResponseEntity<String> acceptInvite(@RequestBody AcceptInviteRequest request) {
+        userService.acceptInvite(request.getEmail(), request.getPassword());
+        return ResponseEntity.ok("Invitation accepted successfully!");
+    }
+
+
 
     @PostMapping(value = "/client", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> createUserByVet(@RequestBody @Valid ClientRegister clientRegister,
