@@ -3,6 +3,7 @@ package com.liro.usersservice.services;
 import com.liro.usersservice.domain.enums.State;
 import com.liro.usersservice.domain.model.UserInvite;
 import com.liro.usersservice.persistance.UserInviteRepository;
+import com.liro.usersservice.persistance.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ public class ScheduledService {
 
     @Autowired
     private UserInviteRepository userInviteRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Transactional
     public void deleteInvite() {
@@ -25,6 +28,7 @@ public class ScheduledService {
 
         for (UserInvite oldInvite : oldInvites) {
             oldInvite.getUser().setState(State.LOCAL);
+            userRepository.save(oldInvite.getUser());
         }
 
         userInviteRepository.deleteAll(oldInvites);
