@@ -1,14 +1,17 @@
 package com.liro.usersservice.exceptions.handlers;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.liro.usersservice.exceptions.BadRequestException;
-import com.liro.usersservice.exceptions.ConflictException;
 import com.liro.usersservice.exceptions.ResourceNotFoundException;
 import com.liro.usersservice.exceptions.UnauthorizedException;
+import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -18,145 +21,140 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
-import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static com.liro.usersservice.exceptions.constants.ErrorCodes.*;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
+@Slf4j
 @ControllerAdvice
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestExceptionHandler {
 
-    // TODO: Refinar y mover a una clase en una dependencia starter o commons de ser necesario
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<Object> handleFeignException(FeignException ex) {
 
-    @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(
-        MissingServletRequestParameterException ex, HttpHeaders headers,
-        HttpStatus status, WebRequest request) {
-        String error = ex.getParameterName() + " parameter is missing";
-        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error, ex));
+        int status = ex.status();
+
+        if (status == 401) {
+            return buildResponseEntity(new ApiError(HttpStatus.valueOf(status), "Permissions Denied", UNAUTHORIZED));
+        }
+        String message = extractFeignMessage(ex);
+        String code = extractFeignCode(ex);
+
+        log.error("{} error. Message: {}", code, message);
+        return buildResponseEntity(new ApiError(HttpStatus.valueOf(status), message, code));
     }
 
-    @Override
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(
+            MissingServletRequestParameterException ex) {
+        String error = ex.getParameterName() + " parameter is missing";
+
+        log.error("{} error. Message: {}", BAD_REQUEST, error);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error, BAD_REQUEST));
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
-        HttpMediaTypeNotSupportedException ex,
-        HttpHeaders headers,
-        HttpStatus status,
-        WebRequest request) {
+            HttpMediaTypeNotSupportedException ex) {
         StringBuilder builder = new StringBuilder();
         builder.append(ex.getContentType());
         builder.append(" media type is not supported. Supported media types are ");
         ex.getSupportedMediaTypes().forEach(t -> builder.append(t).append(", "));
+
+        String errorMessage = builder.substring(0, builder.length() - 2);
+
+        log.error("{} error. Message: {}", BAD_REQUEST, errorMessage);
         return buildResponseEntity(new ApiError(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
-            builder.substring(0, builder.length() - 2), ex));
+                errorMessage, BAD_REQUEST));
     }
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-        MethodArgumentNotValidException ex,
-        HttpHeaders headers,
-        HttpStatus status,
-        WebRequest request) {
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
-        apiError.setMessage("Validation error");
-        apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
-        apiError.addValidationError(ex.getBindingResult().getGlobalErrors());
-        return buildResponseEntity(apiError);
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler({org.hibernate.exception.ConstraintViolationException.class, DataIntegrityViolationException.class})
+    protected ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex, DataIntegrityViolationException dataEx) {
+
+        log.error("{} error. Message: {}", VALIDATION_ERROR, ex.getMessage());
+        return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, ex.getMessage(), VALIDATION_ERROR));
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    protected ResponseEntity<Object> handleConstraintViolation(
-        ConstraintViolationException ex) {
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
-        apiError.setMessage("Validation error");
-        apiError.addValidationErrors(ex.getConstraintViolations());
-        return buildResponseEntity(apiError);
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+
+        String errorMessage = "Malformed JSON request";
+
+        log.error("{} error. Message: {}", BAD_REQUEST, errorMessage);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, errorMessage, BAD_REQUEST));
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    protected ResponseEntity<Object> handleEntityNotFound(
-        EntityNotFoundException ex) {
-        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
-        apiError.setMessage(ex.getMessage());
-        return buildResponseEntity(apiError);
-    }
+    @ExceptionHandler(HttpMessageNotWritableException.class)
+    protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex) {
+        String errorMessage = "Error writing JSON output";
 
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-                                                                  HttpHeaders headers, HttpStatus status,
-                                                                  WebRequest request) {
-        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, "Malformed JSON request", ex));
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex,
-                                                                  HttpHeaders headers, HttpStatus status,
-                                                                  WebRequest request) {
-        String error = "Error writing JSON output";
-        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, error, ex));
+        log.error("{} error. Message: {}", INTERNAL_SERVER_ERROR, errorMessage);
+        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, INTERNAL_SERVER_ERROR));
     }
 
 
-    @Override
-    protected ResponseEntity<Object> handleNoHandlerFoundException(
-        NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
-        apiError.setMessage(String.format("Could not find the %s method for URL %s", ex.getHttpMethod(),
-            ex.getRequestURL()));
-        apiError.setDebugMessage(ex.getMessage());
-        return buildResponseEntity(apiError);
-    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ResponseEntity<Object> handleWebExchangeBindException(MethodArgumentNotValidException e) {
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    protected ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-        if (ex.getCause() instanceof ConstraintViolationException) {
-            return buildResponseEntity(new ApiError(HttpStatus.CONFLICT, "Database error", ex.getCause()));
-        }
-        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex));
-    }
+        String errors = e.getAllErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .sorted()
+                .collect(Collectors.joining(", "));
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    protected ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
-        apiError.setMessage(String.format("The parameter '%s' of value '%s' could not be converted to type '%s'",
-            ex.getName(), ex.getValue(), Objects.requireNonNull(ex.getRequiredType()).getSimpleName()));
-        apiError.setDebugMessage(ex.getMessage());
-        return buildResponseEntity(apiError);
+        log.error("{} error. Message: {}", BAD_INPUT_REQUEST, errors);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, errors, BAD_INPUT_REQUEST));
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     protected ResponseEntity<Object> handleNotFoundExceptions(RuntimeException ex) {
-        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
-        apiError.setMessage(ex.getMessage());
-        return buildResponseEntity(apiError);
+
+        log.error("{} error. Message: {}", NOT_FOUND, ex.getMessage());
+        return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), NOT_FOUND));
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     protected ResponseEntity<Object> handleUnauthorizedExceptions(RuntimeException ex) {
-        ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED);
-        apiError.setMessage(ex.getMessage());
-        return buildResponseEntity(apiError);
-    }
 
-    @ExceptionHandler(ConflictException.class)
-    protected ResponseEntity<Object> handleConflictExceptions(RuntimeException ex) {
-        ApiError apiError = new ApiError(HttpStatus.CONFLICT);
-        apiError.setMessage(ex.getMessage());
-        return buildResponseEntity(apiError);
+        log.error("{} error. Message: {}", UNAUTHORIZED, ex.getMessage());
+        return buildResponseEntity(new ApiError(HttpStatus.UNAUTHORIZED, ex.getMessage(), UNAUTHORIZED));
     }
 
     @ExceptionHandler(BadRequestException.class)
     protected ResponseEntity<Object> handleBadRequestExceptions(RuntimeException ex) {
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
-        apiError.setMessage(ex.getMessage());
-        return buildResponseEntity(apiError);
+
+        log.error("{} error. Message: {}", BAD_REQUEST, ex.getMessage());
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), BAD_REQUEST));
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
+
+    private String extractFeignMessage(FeignException ex) {
+        try {
+            // Parsear el JSON del contenido de Feign (si existe)
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(ex.contentUTF8());
+            return jsonNode.has("message") ? jsonNode.get("message").asText() : ex.getMessage();
+        } catch (Exception e) {
+            return ex.getMessage();
+        }
+    }
+
+    private String extractFeignCode(FeignException ex) {
+        try {
+            // Extraer el código del error desde el JSON de Feign (si existe)
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(ex.contentUTF8());
+            return jsonNode.has("code") ? jsonNode.get("code").asText() : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

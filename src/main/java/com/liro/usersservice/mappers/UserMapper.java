@@ -28,5 +28,6 @@ public interface UserMapper {
     User clientRegisterToUser(ClientRegister clientRegister);
 
     @Mapping(target = "addresses", ignore = true)
+    @Mapping(target = "email", ignore = true)
     void updateUser(UserDTO userDTO, @MappingTarget User user);
 }

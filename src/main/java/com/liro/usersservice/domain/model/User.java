@@ -43,6 +43,7 @@ public class User implements Serializable {
     private String surname;
     private String phoneNumber;
     private String areaPhoneNumber;
+    private String firebaseToken;
 
     @Column(unique = true)
     private String codigoVetter;

@@ -3,7 +3,6 @@ package com.liro.usersservice.controllers;
 import com.liro.usersservice.domain.dtos.users.*;
 import com.liro.usersservice.domain.model.User;
 import com.liro.usersservice.services.UserService;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import org.slf4j.Logger;
@@ -25,7 +24,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import static com.liro.usersservice.services.Util.getUser;
@@ -112,9 +110,9 @@ public class UserController {
         return ResponseEntity.created(location).body(user1);
     }
 
-    @PostMapping(value = "/send-invite",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> sendInviteMail(@RequestParam("email")String email,
-                                               @RequestParam("userId")Long  userId,
+    @PostMapping(value = "/send-invite", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> sendInviteMail(@RequestParam("email") String email,
+                                               @RequestParam("userId") Long userId,
                                                @RequestHeader(name = "clinicId", required = false) Long clinicId,
                                                @RequestHeader(name = "Authorization", required = false) String token) throws MessagingException, IOException {
 
@@ -123,10 +121,19 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value = "/invite",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> inviteExists(@RequestParam("email") String email)  {
+    @GetMapping(value = "/invite", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> inviteExists(@RequestParam("email") String email) {
 
         return ResponseEntity.ok().body(userService.existInvite(email));
+    }
+
+
+    @PostMapping("/firebase-token")
+    public ResponseEntity<String> setFirebaseToken(@RequestBody FirebaseTokenRequestDTO firebaseTokenRequestDTO,
+                                                   @RequestHeader(name = "Authorization", required = false) String token) {
+
+        userService.setFirebaseToken(firebaseTokenRequestDTO.getFirebaseToken(), getUser(token, null));
+        return ResponseEntity.ok("Firebase Token accepted successfully!");
     }
 
 
@@ -135,7 +142,6 @@ public class UserController {
         userService.acceptInvite(request.getEmail(), request.getPassword());
         return ResponseEntity.ok("Invitation accepted successfully!");
     }
-
 
 
     @PostMapping(value = "/client", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -162,7 +168,7 @@ public class UserController {
 
     @PostMapping(value = "/clients/cpvet", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<HashMap<String, UserResponse>> createUserByCPVetMigrator(@RequestBody @Valid HashMap<String, ClientRegister> clientRegisters,
-                                                                           @RequestParam("vetClinicId") Long vetClinicId) {
+                                                                                   @RequestParam("vetClinicId") Long vetClinicId) {
 
         return ResponseEntity.ok().body(userService.createUsersByCpVetMigrator(clientRegisters, vetClinicId));
     }
@@ -176,7 +182,7 @@ public class UserController {
 
     @PutMapping(value = "/client/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserResponse> updateClient(@RequestBody UserDTO user,
-                                                    @PathVariable("id") Long id) {
+                                                     @PathVariable("id") Long id) {
 
         return ResponseEntity.ok(userService.updateUser(user, id));
     }

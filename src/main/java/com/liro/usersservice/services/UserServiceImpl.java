@@ -7,7 +7,7 @@ import com.liro.usersservice.configuration.PasswordGenerator;
 import com.liro.usersservice.domain.dtos.users.*;
 import com.liro.usersservice.domain.enums.State;
 import com.liro.usersservice.domain.model.*;
-import com.liro.usersservice.exceptions.NotFoundException;
+import com.liro.usersservice.exceptions.ResourceNotFoundException;
 import com.liro.usersservice.exceptions.UnauthorizedException;
 import com.liro.usersservice.mappers.AddressMapper;
 import com.liro.usersservice.mappers.UserMapper;
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserCompleteResponse findById(Long id) {
         return userMapper.userToUseCompleteResponse(userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Resource not found")));
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found")));
     }
 
     @Override
@@ -82,11 +82,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("Resource not found")));
     }
 
+    //TODO: DELETE THIS METHOD
     @Override
     public UserResponse setAccount(SetAccountDTO setAccountDTO) {
 
         User user = userRepository.findUserByEmail(setAccountDTO.getEmail())
-                .orElseThrow(() -> new RuntimeException("Resource not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
         if (user.getPassword() == null) {
             user.setPassword(passwordEncoder.encode(setAccountDTO.getPassword()));
@@ -99,7 +100,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserCompleteResponse findByUsername(String username) {
         User user = userRepository.findUserByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Resource not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found by username"));
         return userMapper.userToUseCompleteResponse(user);
 
     }
@@ -107,7 +108,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserCompleteResponse findByEmail(String email) {
         User user = userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Resource not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found by email"));
         return userMapper.userToUseCompleteResponse(user);
     }
 
@@ -175,7 +176,7 @@ public class UserServiceImpl implements UserService {
         }
 
 
-        // Devolver los resultados paginados
+        // TODO: REQUEST ALL THE ANIMALS FROM THE IDS AT ONCE
         return userRepository.findAll(spec, pageable)
                 .map(user -> {
                     UserAnimalsResponse response = userMapper.userToUserAnimalsResponse(user);
@@ -184,6 +185,7 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
+    //TODO: CHANGE THIS LEGACY FLOW IF ITS GOING TO BE USED, USER CAN NOT SET NEITHER EMAIL OR PASSWORD.
     @Override
     public UserResponse createUser(UserRegister userRegister) {
 
@@ -350,6 +352,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.userToUserResponse(user1);
     }
 
+    //TODO: CHECK IF THE USER IS THE ONE WHO IS EDITING, OR IF IT IS LOCAL (AND THE VET IS THE ONE EDITING)
     @Override
     public UserResponse updateUser(UserDTO userDTO, Long id) {
 
@@ -427,7 +430,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void acceptInvite(String email, String password) {
-        UserInvite userInvite = userInviteRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("Su invitacion no existe o ha expirado"));
+        UserInvite userInvite = userInviteRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Su invitacion no existe o ha expirado"));
 
         if (!passwordEncoder.matches(password, userInvite.getPassword())) {
             throw new RuntimeException("password incorrecta");
@@ -446,6 +449,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean existInvite(String email) {
         return userInviteRepository.existsByEmail(email);
+    }
+
+    @Override
+    public void setFirebaseToken(String firebaseToken, JwtUserDTO userDTO) {
+
+       User user =  userRepository.findById(userDTO.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+       user.setFirebaseToken(firebaseToken);
+
+       userRepository.save(user);
     }
 
     @Override

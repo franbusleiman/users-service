@@ -41,4 +41,5 @@ public class AnimalDTO {
     private Long breedId;
     private int numberOfPhotos;
     private Long ownerUserId;
+    private String profilePictureURL;
 }

@@ -46,5 +46,7 @@ public interface UserService {
 
     void acceptInvite(String email, String password);
     Boolean existInvite(String email);
+
+    void setFirebaseToken(String firebaseToken, JwtUserDTO userDTO);
     void deleteUser(Long id);
 }
