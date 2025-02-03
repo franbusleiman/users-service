@@ -36,8 +36,6 @@ public class ScheduledService {
         userRepository.saveAll(users);
         userInviteRepository.deleteAll(oldInvites);
 
-
-
         System.out.println("Registros eliminados: " + oldInvites.size());
 
     }
