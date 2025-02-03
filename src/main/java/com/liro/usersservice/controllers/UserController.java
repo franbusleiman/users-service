@@ -66,6 +66,14 @@ public class UserController {
         return ResponseEntity.ok(userService.findByUsername(username));
     }
 
+    @GetMapping(value = "/test", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserCompleteResponse>> getUsersByUsername() throws InterruptedException {
+
+        logger.info("Getting user by username");
+
+        return ResponseEntity.ok(userService.test());
+    }
+
     @GetMapping(value = "/getCurrent", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserCompleteResponse> getCurrentUser(@RequestHeader(name = "Authorization", required = false) String token) throws InterruptedException {
 

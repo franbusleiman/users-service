@@ -106,6 +106,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<UserCompleteResponse> test() {
+        return userRepository.findAll().stream()
+                .map(u -> userMapper.userToUseCompleteResponse(u))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public UserCompleteResponse findByEmail(String email) {
         User user = userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found by email"));

@@ -21,6 +21,8 @@ public interface UserService {
 
 
     UserCompleteResponse findByUsername(String username);
+    List<UserCompleteResponse> test();
+
 
     UserCompleteResponse findByEmail(String email);
 
