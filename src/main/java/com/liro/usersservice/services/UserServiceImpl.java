@@ -399,8 +399,11 @@ public class UserServiceImpl implements UserService {
         }
 
         //Validar que el mail   no se esta usando
-        if (userRepository.findUserByEmail(email).isPresent() || userInviteRepository.findByEmail(email).isPresent()) {
-            throw new BadRequestException("Email " + email +  "already in use");
+        if (userRepository.findUserByEmail(email).isPresent()){
+            throw new BadRequestException("Ya existe un usuario con el email: " + email);
+
+        }else if(userInviteRepository.findByEmail(email).isPresent()){
+            throw new BadRequestException("Ya existe una invitacion para " + email);
         }
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
