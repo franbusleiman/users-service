@@ -7,6 +7,7 @@ import com.liro.usersservice.configuration.PasswordGenerator;
 import com.liro.usersservice.domain.dtos.users.*;
 import com.liro.usersservice.domain.enums.State;
 import com.liro.usersservice.domain.model.*;
+import com.liro.usersservice.exceptions.BadRequestException;
 import com.liro.usersservice.exceptions.ResourceNotFoundException;
 import com.liro.usersservice.exceptions.UnauthorizedException;
 import com.liro.usersservice.mappers.AddressMapper;
@@ -399,13 +400,13 @@ public class UserServiceImpl implements UserService {
 
         //Validar que el mail   no se esta usando
         if (userRepository.findUserByEmail(email).isPresent() || userInviteRepository.findByEmail(email).isPresent()) {
-            throw new RuntimeException("Email already in use");
+            throw new BadRequestException("Email " + email +  "already in use");
         }
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Resource not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Resource not found"));
 
         if (user.getState() == State.ACCEPTED) {
-            throw new RuntimeException("User already active!");
+            throw new BadRequestException("User already active!");
         }
 
         String generatedPassword = PasswordGenerator.generatePassword();
