@@ -212,6 +212,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+
     public UserResponse createUserByVet(ClientRegister userRegister, JwtUserDTO userDTO) {
 
         VetProfile vetProfile = vetProfileRepository.findByUserId(userDTO.getId())

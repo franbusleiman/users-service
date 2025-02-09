@@ -12,7 +12,7 @@ public class InviteScheduler {
     @Autowired
     ScheduledService scheduledService;
 
-    @Scheduled(cron = "0 0 3 ? * MON")
+ //   @Scheduled(cron = "0 0 3 ? * MON")
     public void scheduleDeleteOldInvites() {
         System.out.println("Iniciando eliminación de registros antiguos...");
         scheduledService.deleteInvite();
